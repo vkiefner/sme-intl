@@ -1,0 +1,1360 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="session04_slides_files/libs/clipboard/clipboard.min.js"></script>
+<script src="session04_slides_files/libs/quarto-html/tabby.min.js"></script>
+<script src="session04_slides_files/libs/quarto-html/popper.min.js"></script>
+<script src="session04_slides_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="session04_slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="session04_slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="session04_slides_files/libs/quarto-html/quarto-syntax-highlighting-0626ff4d7a71b55c8707dcae1d04a9b6.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.6.39">
+
+  <meta name="author" content="WU Vienna | SS 2026">
+  <meta name="dcterms.date" content="2026-05-06">
+  <title>Reproducible Research Setup</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="session04_slides_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="session04_slides_files/libs/revealjs/dist/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+      }
+    pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+    div.sourceCode
+      { color: #24292e;  }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #24292e; } /* Normal */
+    code span.al { color: #ff5555; font-weight: bold; } /* Alert */
+    code span.an { color: #6a737d; } /* Annotation */
+    code span.at { color: #d73a49; } /* Attribute */
+    code span.bn { color: #005cc5; } /* BaseN */
+    code span.bu { color: #d73a49; } /* BuiltIn */
+    code span.cf { color: #d73a49; } /* ControlFlow */
+    code span.ch { color: #032f62; } /* Char */
+    code span.cn { color: #005cc5; } /* Constant */
+    code span.co { color: #6a737d; } /* Comment */
+    code span.cv { color: #6a737d; } /* CommentVar */
+    code span.do { color: #6a737d; } /* Documentation */
+    code span.dt { color: #d73a49; } /* DataType */
+    code span.dv { color: #005cc5; } /* DecVal */
+    code span.er { color: #ff5555; text-decoration: underline; } /* Error */
+    code span.ex { color: #d73a49; font-weight: bold; } /* Extension */
+    code span.fl { color: #005cc5; } /* Float */
+    code span.fu { color: #6f42c1; } /* Function */
+    code span.im { color: #032f62; } /* Import */
+    code span.in { color: #6a737d; } /* Information */
+    code span.kw { color: #d73a49; } /* Keyword */
+    code span.op { color: #24292e; } /* Operator */
+    code span.ot { color: #6f42c1; } /* Other */
+    code span.pp { color: #d73a49; } /* Preprocessor */
+    code span.re { color: #6a737d; } /* RegionMarker */
+    code span.sc { color: #005cc5; } /* SpecialChar */
+    code span.ss { color: #032f62; } /* SpecialString */
+    code span.st { color: #032f62; } /* String */
+    code span.va { color: #e36209; } /* Variable */
+    code span.vs { color: #032f62; } /* VerbatimString */
+    code span.wa { color: #ff5555; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="session04_slides_files/libs/revealjs/dist/theme/quarto-bbe7401fe57d4b791b917637bb662036.css">
+  <link rel="stylesheet" href=":root { --wu-blue: #002f5f; --wu-red: #c8102e; }
+.reveal h1, .reveal h2 { color: var(--wu-blue); }
+.reveal h3 { color: var(--wu-red); font-size: 0.95em; }
+.box {
+  border-left: 4px solid var(--wu-red);
+  background: #f8f8f8;
+  padding: 0.5em 1em;
+  border-radius: 4px;
+  margin: 0.4em 0;
+  font-size: 0.87em;
+}
+.blue-box {
+  border: 2px solid var(--wu-blue);
+  background: #eef3f9;
+  padding: 0.6em 1em;
+  border-radius: 6px;
+  margin: 0.4em 0;
+  font-size: 0.87em;
+}
+.small { font-size: 0.80em; }
+.tiny  { font-size: 0.68em; }
+table { font-size: 0.78em; }">
+  <link href="session04_slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="session04_slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="session04_slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="session04_slides_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <h1 class="title">Reproducible Research Setup</h1>
+  <p class="subtitle">Session 4 — ExInt II: Research Designs in SME Research</p>
+
+<div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+WU Vienna | SS 2026 
+</div>
+</div>
+</div>
+
+  <p class="date">2026-05-06</p>
+</section>
+<section id="today-at-a-glance" class="slide level2" data-background-color="#002f5f">
+<h2>Today at a Glance</h2>
+<div class="columns">
+<div class="column" style="width:55%;">
+<p><strong>What we cover</strong></p>
+<ol type="1">
+<li>Why reproducible research?</li>
+<li>Python environment setup — live</li>
+<li>Project folder structure + Taskfile</li>
+<li>Code quality: ruff (linting &amp; formatting)</li>
+<li>Git &amp; GitHub</li>
+<li>Zotero + Quarto</li>
+<li>Research question &amp; hypothesis</li>
+</ol>
+</div><div class="column" style="width:42%;">
+<p><strong>End-of-session deliverable</strong></p>
+<div class="blue-box">
+<p>✅ Working Python environment<br>
+✅ Project on GitHub with full structure<br>
+✅ Zotero + <code>library.bib</code> auto-export<br>
+✅ Research question + hypothesis in <code>README.md</code></p>
+</div>
+</div></div>
+</section>
+<section id="the-problem-code-does-not-run" class="slide level2">
+<h2>The Problem: Code Does Not Run</h2>
+<div class="columns">
+<div class="column" style="width:56%;">
+<p><strong>Large-scale study on research code quality</strong><br>
+<a href="https://www.nature.com/articles/s41597-022-01143-6">Nature Scientific Data, 2022</a></p>
+<p>Analysis of 2,000+ replication datasets with 9,000+ R files (2010–2020):</p>
+<ul>
+<li><strong>74%</strong> failed on first run</li>
+<li><strong>56%</strong> failed even after automated code cleaning</li>
+</ul>
+<p>Most common causes: missing packages, hardcoded paths, wrong execution order</p>
+<div class="box">
+<p>The same failure modes apply to Python. This course teaches you to avoid all of them.</p>
+</div>
+</div><div class="column" style="width:42%;">
+<p><strong>You run your analysis, submit the paper.</strong><br>
+One year later, you need to extend it.</p>
+<p>Problems you will face:</p>
+<ul>
+<li>Python package APIs changed → code breaks</li>
+<li>You forgot the sequence of steps</li>
+<li>Your collaborator can’t run it at all</li>
+</ul>
+<p>→ Every problem has a fix. We implement them today.</p>
+</div></div>
+</section>
+<section id="five-fixes-for-reproducibility" class="slide level2">
+<h2>Five Fixes for Reproducibility</h2>
+<table class="caption-top">
+<colgroup>
+<col style="width: 64%">
+<col style="width: 35%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Problem</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Hardcoded absolute paths (<code>C:/user/data/file.csv</code>)</td>
+<td>Use <strong>relative paths</strong> (<code>data/file.csv</code>)</td>
+</tr>
+<tr class="even">
+<td>Unclear which packages &amp; versions</td>
+<td><code>pip freeze &gt; requirements.txt</code></td>
+</tr>
+<tr class="odd">
+<td>Scripts run in wrong order</td>
+<td><strong>Taskfile</strong> with numbered dependencies</td>
+</tr>
+<tr class="even">
+<td>Code untested on clean machine</td>
+<td>Test in fresh <strong>venv</strong> before sharing</td>
+</tr>
+<tr class="odd">
+<td>Proprietary software</td>
+<td>Use <strong>free &amp; open-source</strong> tools</td>
+</tr>
+</tbody>
+</table>
+<div class="box">
+<p>Source: <a href="https://www.nature.com/articles/s41597-022-01143-6">Trisovic et al.&nbsp;(2022), Nature Scientific Data</a></p>
+</div>
+<p><strong>Four pillars of a reproducible project:</strong><br>
+Version control (Git) · Consistent structure · Documentation (README) · Automation (Taskfile)</p>
+</section>
+<section id="tools-we-use-in-this-course" class="slide level2" data-background-color="#f0f4f9">
+<h2>Tools We Use in This Course</h2>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Tool</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>VS Code</strong> / JupyterLab</td>
+<td>IDE</td>
+</tr>
+<tr class="even">
+<td><strong>venv</strong></td>
+<td>Python environment isolation</td>
+</tr>
+<tr class="odd">
+<td><strong>pip</strong> / <strong>uv</strong></td>
+<td>Package management</td>
+</tr>
+<tr class="even">
+<td><strong>ruff</strong></td>
+<td>Linting + formatting (replaces flake8 + Black + isort)</td>
+</tr>
+<tr class="odd">
+<td><strong>pyproject.toml</strong></td>
+<td>Project configuration</td>
+</tr>
+<tr class="even">
+<td><strong>Taskfile</strong></td>
+<td>Automation — correct script execution order</td>
+</tr>
+<tr class="odd">
+<td><strong>Git + GitHub</strong></td>
+<td>Version control</td>
+</tr>
+<tr class="even">
+<td><strong>Zotero + Better BibTeX</strong></td>
+<td>Reference management → <code>library.bib</code></td>
+</tr>
+<tr class="odd">
+<td><strong>Quarto</strong></td>
+<td>Render <code>research_note.md</code> → PDF / HTML</td>
+</tr>
+<tr class="even">
+<td><strong>WRDS Python API</strong></td>
+<td>Data access (Compustat Global)</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="step-1-virtual-environment-venv" class="slide level2" data-background-color="#f0f4f9">
+<h2>Step 1 — Virtual Environment: venv</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><strong>venv vs conda</strong></p>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>venv</strong></th>
+<th><strong>conda</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Built-in</td>
+<td>✅</td>
+<td>❌ (install separately)</td>
+</tr>
+<tr class="even">
+<td>Lightweight</td>
+<td>✅</td>
+<td>❌</td>
+</tr>
+<tr class="odd">
+<td>Own Python per env</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr class="even">
+<td>Non-Python deps</td>
+<td>❌</td>
+<td>✅ (R, C libs)</td>
+</tr>
+<tr class="odd">
+<td>For this course</td>
+<td>✅ sufficient</td>
+<td>Optional</td>
+</tr>
+</tbody>
+</table>
+<div class="box">
+<p>Use <code>.venv</code> as the folder name — VS Code detects it automatically, and GitHub’s Python <code>.gitignore</code> template excludes it automatically.</p>
+</div>
+</div><div class="column" style="width:48%;">
+<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href=""></a><span class="co"># 1. Create virtual environment</span></span>
+<span id="cb1-2"><a href=""></a><span class="ex">python</span> <span class="at">-m</span> venv .venv</span>
+<span id="cb1-3"><a href=""></a></span>
+<span id="cb1-4"><a href=""></a><span class="co"># 2. Activate (Mac / Linux)</span></span>
+<span id="cb1-5"><a href=""></a><span class="bu">source</span> .venv/bin/activate</span>
+<span id="cb1-6"><a href=""></a></span>
+<span id="cb1-7"><a href=""></a><span class="co"># 2. Activate (Windows)</span></span>
+<span id="cb1-8"><a href=""></a><span class="ex">.venv\Scripts\activate</span></span>
+<span id="cb1-9"><a href=""></a></span>
+<span id="cb1-10"><a href=""></a><span class="co"># 3. Install packages</span></span>
+<span id="cb1-11"><a href=""></a><span class="ex">pip</span> install pandas statsmodels <span class="dt">\</span></span>
+<span id="cb1-12"><a href=""></a>  linearmodels wrds matplotlib <span class="dt">\</span></span>
+<span id="cb1-13"><a href=""></a>  seaborn jupyterlab ruff</span>
+<span id="cb1-14"><a href=""></a></span>
+<span id="cb1-15"><a href=""></a><span class="co"># 4. Freeze exact versions</span></span>
+<span id="cb1-16"><a href=""></a><span class="ex">pip</span> freeze <span class="op">&gt;</span> requirements.txt</span>
+<span id="cb1-17"><a href=""></a></span>
+<span id="cb1-18"><a href=""></a><span class="co"># 5. Deactivate when done</span></span>
+<span id="cb1-19"><a href=""></a><span class="ex">deactivate</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div></div>
+</section>
+<section id="step-2-package-managers" class="slide level2">
+<h2>Step 2 — Package Managers</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<h3 id="pip-default-always-available">pip (default, always available)</h3>
+<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href=""></a><span class="ex">pip</span> install pandas</span>
+<span id="cb2-2"><a href=""></a><span class="ex">pip</span> install <span class="at">-r</span> requirements.txt  <span class="co"># reproduce</span></span>
+<span id="cb2-3"><a href=""></a><span class="ex">pip</span> freeze <span class="op">&gt;</span> requirements.txt    <span class="co"># export</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<h3 id="uv-modern-written-in-rust-very-fast">uv (modern — written in Rust, very fast)</h3>
+<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href=""></a><span class="ex">pip</span> install uv</span>
+<span id="cb3-2"><a href=""></a><span class="ex">uv</span> pip install pandas</span>
+<span id="cb3-3"><a href=""></a><span class="ex">uv</span> pip freeze <span class="op">&gt;</span> requirements.txt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="box">
+<p><strong>Why pinned versions matter:</strong><br>
+<code>statsmodels</code> 0.13 → 0.14 changed default standard errors. Without <code>requirements.txt</code>, your results may not reproduce — even on your own machine next year.</p>
+</div>
+</div><div class="column" style="width:48%;">
+<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource txt number-lines code-with-copy"><code class="sourceCode default"><span id="cb4-1"><a href=""></a># requirements.txt (example)</span>
+<span id="cb4-2"><a href=""></a>pandas==2.2.1</span>
+<span id="cb4-3"><a href=""></a>numpy==1.26.4</span>
+<span id="cb4-4"><a href=""></a>statsmodels==0.14.1</span>
+<span id="cb4-5"><a href=""></a>linearmodels==5.4</span>
+<span id="cb4-6"><a href=""></a>matplotlib==3.8.3</span>
+<span id="cb4-7"><a href=""></a>seaborn==0.13.2</span>
+<span id="cb4-8"><a href=""></a>wrds==3.2.0</span>
+<span id="cb4-9"><a href=""></a>python-dotenv==1.0.1</span>
+<span id="cb4-10"><a href=""></a>jupyterlab==4.1.5</span>
+<span id="cb4-11"><a href=""></a>ruff==0.4.2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Anyone can now reproduce your environment exactly:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href=""></a><span class="ex">python</span> <span class="at">-m</span> venv .venv</span>
+<span id="cb5-2"><a href=""></a><span class="bu">source</span> .venv/bin/activate</span>
+<span id="cb5-3"><a href=""></a><span class="ex">pip</span> install <span class="at">-r</span> requirements.txt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div></div>
+</section>
+<section id="step-3-code-quality-ruff" class="slide level2">
+<h2>Step 3 — Code Quality: ruff</h2>
+<div class="columns">
+<div class="column" style="width:52%;">
+<p><strong>Linters</strong> detect problems before you run code:</p>
+<ul>
+<li><code>flake8</code> — style + error checking</li>
+<li><code>pylint</code> — deeper analysis</li>
+<li><code>mypy</code> — static type checking</li>
+<li><strong><code>ruff</code></strong> — replaces all of the above + formatting</li>
+</ul>
+<p><strong>Formatters</strong> auto-format your code:</p>
+<ul>
+<li><code>Black</code> — opinionated formatter</li>
+<li><code>isort</code> — sorts import statements</li>
+<li><strong><code>ruff</code></strong> — does both</li>
+</ul>
+<div class="box">
+<p>💡 Install only <code>ruff</code>. One tool, written in Rust, replaces flake8 + Black + isort. Orders of magnitude faster.</p>
+</div>
+</div><div class="column" style="width:46%;">
+<div class="sourceCode" id="cb6"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href=""></a><span class="co"># Check for issues</span></span>
+<span id="cb6-2"><a href=""></a><span class="ex">ruff</span> check code/</span>
+<span id="cb6-3"><a href=""></a></span>
+<span id="cb6-4"><a href=""></a><span class="co"># Auto-fix issues</span></span>
+<span id="cb6-5"><a href=""></a><span class="ex">ruff</span> check <span class="at">--fix</span> code/</span>
+<span id="cb6-6"><a href=""></a></span>
+<span id="cb6-7"><a href=""></a><span class="co"># Format code</span></span>
+<span id="cb6-8"><a href=""></a><span class="ex">ruff</span> format code/</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong><code>pyproject.toml</code></strong> (minimal config):</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode numberSource toml number-lines code-with-copy"><code class="sourceCode toml"><span id="cb7-1"><a href=""></a><span class="kw">[project]</span></span>
+<span id="cb7-2"><a href=""></a><span class="dt">name</span> <span class="op">=</span> <span class="st">"sme-internationalization"</span></span>
+<span id="cb7-3"><a href=""></a><span class="dt">requires-python</span> <span class="op">=</span> <span class="st">"&gt;=3.10"</span></span>
+<span id="cb7-4"><a href=""></a></span>
+<span id="cb7-5"><a href=""></a><span class="kw">[tool.ruff]</span></span>
+<span id="cb7-6"><a href=""></a><span class="dt">line-length</span> <span class="op">=</span> <span class="dv">88</span></span>
+<span id="cb7-7"><a href=""></a><span class="dt">exclude</span> <span class="op">=</span> <span class="op">[</span><span class="st">".venv"</span><span class="op">]</span></span>
+<span id="cb7-8"><a href=""></a></span>
+<span id="cb7-9"><a href=""></a><span class="kw">[tool.ruff.lint]</span></span>
+<span id="cb7-10"><a href=""></a><span class="dt">select</span> <span class="op">=</span> <span class="op">[</span><span class="st">"E4"</span><span class="op">,</span> <span class="st">"E7"</span><span class="op">,</span> <span class="st">"E9"</span><span class="op">,</span> <span class="st">"F"</span><span class="op">]</span></span>
+<span id="cb7-11"><a href=""></a></span>
+<span id="cb7-12"><a href=""></a><span class="kw">[tool.ruff.format]</span></span>
+<span id="cb7-13"><a href=""></a><span class="dt">quote-style</span> <span class="op">=</span> <span class="st">"double"</span></span>
+<span id="cb7-14"><a href=""></a><span class="dt">indent-style</span> <span class="op">=</span> <span class="st">"space"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div></div>
+</section>
+<section id="step-4-project-structure" class="slide level2">
+<h2>Step 4 — Project Structure</h2>
+<pre><code>sme-internationalization/           ← Git repository root
+│
+├── data/
+│   ├── raw/           ← NEVER edit. Downloaded from WRDS. Not tracked by Git.
+│   └── processed/     ← Output of cleaning scripts. Can be regenerated.
+│
+├── code/
+│   ├── 01_pull_data.py       ← WRDS API pull
+│   ├── 02_clean.py           ← Cleaning &amp; variable construction
+│   ├── 03_descriptives.py    ← Summary stats &amp; figures
+│   └── 04_regression.py      ← Panel regressions (linearmodels)
+│
+├── output/
+│   ├── tables/    ← .csv regression tables
+│   └── figures/   ← .png plots
+│
+├── references/
+│   └── library.bib   ← auto-exported from Zotero (Better BibTeX)
+│
+├── research_note.md   ← main output (Quarto → PDF)
+├── Taskfile.yml       ← automation: run scripts in order
+├── pyproject.toml     ← project config + ruff settings
+├── requirements.txt   ← pinned package versions
+├── .env.example       ← WRDS credentials template
+├── .gitignore
+└── README.md</code></pre>
+</section>
+<section id="step-5-automation-with-taskfile" class="slide level2">
+<h2>Step 5 — Automation with Taskfile</h2>
+<div class="sourceCode" id="cb9"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href=""></a><span class="ex">pip</span> install go-task-bin</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong><code>Taskfile.yml</code></strong> — enforces the correct execution order:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode numberSource yaml number-lines code-with-copy"><code class="sourceCode yaml"><span id="cb10-1"><a href=""></a><span class="fu">version</span><span class="kw">:</span><span class="at"> </span><span class="st">'3'</span></span>
+<span id="cb10-2"><a href=""></a></span>
+<span id="cb10-3"><a href=""></a><span class="fu">tasks</span><span class="kw">:</span></span>
+<span id="cb10-4"><a href=""></a><span class="at">  </span><span class="fu">pull</span><span class="kw">:</span></span>
+<span id="cb10-5"><a href=""></a><span class="at">    </span><span class="fu">cmds</span><span class="kw">:</span></span>
+<span id="cb10-6"><a href=""></a><span class="at">      </span><span class="kw">-</span><span class="at"> python code/01_pull_data.py</span></span>
+<span id="cb10-7"><a href=""></a></span>
+<span id="cb10-8"><a href=""></a><span class="at">  </span><span class="fu">clean</span><span class="kw">:</span></span>
+<span id="cb10-9"><a href=""></a><span class="at">    </span><span class="fu">deps</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">pull</span><span class="kw">]</span></span>
+<span id="cb10-10"><a href=""></a><span class="at">    </span><span class="fu">cmds</span><span class="kw">:</span></span>
+<span id="cb10-11"><a href=""></a><span class="at">      </span><span class="kw">-</span><span class="at"> python code/02_clean.py</span></span>
+<span id="cb10-12"><a href=""></a></span>
+<span id="cb10-13"><a href=""></a><span class="at">  </span><span class="fu">descriptives</span><span class="kw">:</span></span>
+<span id="cb10-14"><a href=""></a><span class="at">    </span><span class="fu">deps</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">clean</span><span class="kw">]</span></span>
+<span id="cb10-15"><a href=""></a><span class="at">    </span><span class="fu">cmds</span><span class="kw">:</span></span>
+<span id="cb10-16"><a href=""></a><span class="at">      </span><span class="kw">-</span><span class="at"> python code/03_descriptives.py</span></span>
+<span id="cb10-17"><a href=""></a></span>
+<span id="cb10-18"><a href=""></a><span class="at">  </span><span class="fu">regression</span><span class="kw">:</span></span>
+<span id="cb10-19"><a href=""></a><span class="at">    </span><span class="fu">deps</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">descriptives</span><span class="kw">]</span></span>
+<span id="cb10-20"><a href=""></a><span class="at">    </span><span class="fu">cmds</span><span class="kw">:</span></span>
+<span id="cb10-21"><a href=""></a><span class="at">      </span><span class="kw">-</span><span class="at"> python code/04_regression.py</span></span>
+<span id="cb10-22"><a href=""></a></span>
+<span id="cb10-23"><a href=""></a><span class="at">  </span><span class="fu">all</span><span class="kw">:</span></span>
+<span id="cb10-24"><a href=""></a><span class="at">    </span><span class="fu">deps</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">regression</span><span class="kw">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href=""></a><span class="ex">task</span> all         <span class="co"># runs the full pipeline</span></span>
+<span id="cb11-2"><a href=""></a><span class="ex">task</span> regression  <span class="co"># runs only regression (+ its deps)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="box">
+<p>Anyone cloning your repo runs <code>task all</code> — one command, correct order, reproducible.</p>
+</div>
+</section>
+<section id="step-6-git-github" class="slide level2" data-background-color="#f0f4f9">
+<h2>Step 6 — Git &amp; GitHub</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><strong>Initialize &amp; push</strong></p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href=""></a><span class="fu">git</span> init</span>
+<span id="cb12-2"><a href=""></a><span class="fu">git</span> add .</span>
+<span id="cb12-3"><a href=""></a><span class="fu">git</span> commit <span class="at">-m</span> <span class="st">"initial project structure"</span></span>
+<span id="cb12-4"><a href=""></a></span>
+<span id="cb12-5"><a href=""></a><span class="fu">git</span> remote add origin https://github.com/<span class="pp">[</span><span class="ss">you</span><span class="pp">]</span>/sme-intl</span>
+<span id="cb12-6"><a href=""></a><span class="fu">git</span> push <span class="at">-u</span> origin main</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Daily commands</strong></p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><a href=""></a><span class="fu">git</span> status                  <span class="co"># what changed?</span></span>
+<span id="cb13-2"><a href=""></a><span class="fu">git</span> diff <span class="at">--color-words</span>      <span class="co"># exact changes</span></span>
+<span id="cb13-3"><a href=""></a><span class="fu">git</span> commit <span class="at">-am</span> <span class="st">"message"</span>    <span class="co"># add + commit tracked</span></span>
+<span id="cb13-4"><a href=""></a><span class="fu">git</span> log <span class="at">--oneline</span> <span class="at">--graph</span>   <span class="co"># visual history</span></span>
+<span id="cb13-5"><a href=""></a><span class="fu">git</span> stash                   <span class="co"># shelve changes temporarily</span></span>
+<span id="cb13-6"><a href=""></a><span class="fu">git</span> reset <span class="at">--soft</span> HEAD~1     <span class="co"># undo last commit, keep changes</span></span>
+<span id="cb13-7"><a href=""></a><span class="fu">git</span> reset <span class="at">--hard</span> origin/main <span class="co"># reset to GitHub state</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div><div class="column" style="width:48%;">
+<p><strong><code>.gitignore</code></strong></p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode numberSource gitignore number-lines code-with-copy"><code class="sourceCode"><span id="cb14-1"><a href=""></a># Virtual environment</span>
+<span id="cb14-2"><a href=""></a>.venv/</span>
+<span id="cb14-3"><a href=""></a></span>
+<span id="cb14-4"><a href=""></a># Raw data (licensing; large files)</span>
+<span id="cb14-5"><a href=""></a>data/raw/</span>
+<span id="cb14-6"><a href=""></a></span>
+<span id="cb14-7"><a href=""></a># Credentials — NEVER commit!</span>
+<span id="cb14-8"><a href=""></a>.env</span>
+<span id="cb14-9"><a href=""></a></span>
+<span id="cb14-10"><a href=""></a># Reference PDFs (managed by Zotero)</span>
+<span id="cb14-11"><a href=""></a>references/*.pdf</span>
+<span id="cb14-12"><a href=""></a></span>
+<span id="cb14-13"><a href=""></a># Python cache</span>
+<span id="cb14-14"><a href=""></a>__pycache__/</span>
+<span id="cb14-15"><a href=""></a>*.pyc</span>
+<span id="cb14-16"><a href=""></a>.ipynb_checkpoints/</span>
+<span id="cb14-17"><a href=""></a></span>
+<span id="cb14-18"><a href=""></a># OS files</span>
+<span id="cb14-19"><a href=""></a>.DS_Store</span>
+<span id="cb14-20"><a href=""></a>Thumbs.db</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="box">
+<p>🔐 <strong>WRDS credentials go in <code>.env</code></strong> (not in code). <code>.env</code> is in <code>.gitignore</code>. Share <code>.env.example</code> instead.</p>
+</div>
+</div></div>
+</section>
+<section id="step-7-pandas-or-polars" class="slide level2">
+<h2>Step 7 — Pandas or Polars?</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><strong>For this project: pandas</strong></p>
+<ul>
+<li>Time series data (firm-years) → pandas aligns on index automatically</li>
+<li><code>statsmodels</code> and <code>linearmodels</code> expect pandas DataFrames</li>
+<li>Larger ecosystem, more Stack Overflow answers</li>
+</ul>
+<p><strong>Pandas index trap</strong> (know this!):</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href=""></a>df <span class="op">=</span> pd.DataFrame({<span class="st">'Customer'</span>: [<span class="st">'A'</span>,<span class="st">'B'</span>,<span class="st">'C'</span>,<span class="st">'D'</span>,<span class="st">'E'</span>],</span>
+<span id="cb15-2"><a href=""></a>                   <span class="st">'Sales'</span>: [<span class="dv">100</span>,<span class="dv">500</span>,<span class="dv">200</span>,<span class="dv">600</span>,<span class="dv">300</span>]})</span>
+<span id="cb15-3"><a href=""></a>high <span class="op">=</span> df[df[<span class="st">'Sales'</span>] <span class="op">&gt;</span> <span class="dv">400</span>].copy()</span>
+<span id="cb15-4"><a href=""></a></span>
+<span id="cb15-5"><a href=""></a><span class="co"># ✅ Works: scores is a plain list</span></span>
+<span id="cb15-6"><a href=""></a>high[<span class="st">'Score'</span>] <span class="op">=</span> [<span class="dv">10</span>, <span class="dv">20</span>]</span>
+<span id="cb15-7"><a href=""></a></span>
+<span id="cb15-8"><a href=""></a><span class="co"># ❌ Silent bug: pandas aligns on original index</span></span>
+<span id="cb15-9"><a href=""></a>high[<span class="st">'Score'</span>] <span class="op">=</span> pd.Series([<span class="dv">10</span>, <span class="dv">20</span>])</span>
+<span id="cb15-10"><a href=""></a><span class="co"># Fix:</span></span>
+<span id="cb15-11"><a href=""></a>high.reset_index(drop<span class="op">=</span><span class="va">True</span>, inplace<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb15-12"><a href=""></a>high[<span class="st">'Score'</span>] <span class="op">=</span> pd.Series([<span class="dv">10</span>, <span class="dv">20</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div><div class="column" style="width:48%;">
+<p><strong>When to use Polars instead:</strong></p>
+<ul>
+<li>Large datasets (millions of rows) → much faster</li>
+<li>General data transformation (no time series alignment needed)</li>
+<li>Written in Rust; lazy evaluation</li>
+</ul>
+<p><strong>Save your cleaned data as Parquet:</strong></p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href=""></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb16-2"><a href=""></a></span>
+<span id="cb16-3"><a href=""></a>df.to_parquet(<span class="st">"data/processed/panel_clean.parquet"</span>)</span>
+<span id="cb16-4"><a href=""></a>df <span class="op">=</span> pd.read_parquet(<span class="st">"data/processed/panel_clean.parquet"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="box">
+<p><strong>Parquet vs CSV:</strong> Parquet is columnar, compressed, schema-aware, and 10–100× faster to read/write for large datasets. Use it for anything you’ll re-read often.</p>
+</div>
+</div></div>
+</section>
+<section id="step-8-reference-management-with-zotero" class="slide level2">
+<h2>Step 8 — Reference Management with Zotero</h2>
+<div class="columns">
+<div class="column" style="width:55%;">
+<p><strong>Setup (once, ~10 minutes)</strong></p>
+<ol type="1">
+<li>Download <a href="https://www.zotero.org/">Zotero</a> + browser connector</li>
+<li>Install <strong>Better BibTeX</strong> plugin</li>
+<li>Point Zotero storage → <code>references/</code> in your project</li>
+<li>Configure auto-export → <code>references/library.bib</code></li>
+</ol>
+<p><strong>Daily workflow</strong></p>
+<ul>
+<li>Find paper → click browser connector</li>
+<li>PDF saved to <code>references/</code> automatically</li>
+<li><code>library.bib</code> updates without any manual step</li>
+</ul>
+</div><div class="column" style="width:43%;">
+<p><strong>Cite in <code>research_note.md</code>:</strong></p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode numberSource yaml number-lines code-with-copy"><code class="sourceCode yaml"><span id="cb17-1"><a href=""></a><span class="pp">---</span></span>
+<span id="cb17-2"><a href=""></a><span class="fu">title</span><span class="kw">:</span><span class="at"> </span><span class="st">"SME Internationalization"</span></span>
+<span id="cb17-3"><a href=""></a><span class="fu">bibliography</span><span class="kw">:</span><span class="at"> references/library.bib</span></span>
+<span id="cb17-4"><a href=""></a><span class="pp">---</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb18-1"><a href=""></a>SMEs face liability of foreignness</span>
+<span id="cb18-2"><a href=""></a><span class="co">[</span><span class="ot">@Zaheer1995</span><span class="co">]</span>, which increases with</span>
+<span id="cb18-3"><a href=""></a>internationalization <span class="co">[</span><span class="ot">@Lu2001</span><span class="co">]</span>.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Render with Quarto:</strong></p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb19-1"><a href=""></a><span class="ex">quarto</span> render research_note.md</span>
+<span id="cb19-2"><a href=""></a><span class="co"># → research_note.pdf</span></span>
+<span id="cb19-3"><a href=""></a><span class="co"># → research_note.html</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="box">
+<p>Docs: <a href="https://quarto.org/docs/guide/">quarto.org/docs/guide</a><br>
+Gallery: <a href="https://quarto.org/docs/gallery/">quarto.org/docs/gallery</a></p>
+</div>
+</div></div>
+</section>
+<section id="jupyter-vs-quarto-when-to-use-which" class="slide level2">
+<h2>Jupyter vs Quarto — When to Use Which</h2>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>JupyterLab</strong></th>
+<th><strong>Quarto <code>.md</code></strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Format</td>
+<td><code>.ipynb</code> (JSON blob)</td>
+<td>Plain text — clean Git diffs</td>
+</tr>
+<tr class="even">
+<td>Best for</td>
+<td>Exploration &amp; prototyping</td>
+<td>Final reproducible output</td>
+</tr>
+<tr class="odd">
+<td>BibTeX citations</td>
+<td>❌ not built-in</td>
+<td>✅ native</td>
+</tr>
+<tr class="even">
+<td>Renders to</td>
+<td>HTML</td>
+<td>PDF, HTML, Word, slides</td>
+</tr>
+<tr class="odd">
+<td>Version control</td>
+<td>❌ messy diffs</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<div class="box">
+<p><strong>Recommended workflow:</strong><br>
+Explore in JupyterLab → finalize pipeline as numbered <code>.py</code> scripts → write <code>research_note.md</code> in Quarto → <code>task all</code> runs everything.</p>
+</div>
+<p>Other tools worth knowing: <strong>marimo</strong> (reactive Python notebooks), <strong>knitr</strong> (R equivalent of Quarto)</p>
+</section>
+<section id="step-9-research-question" class="slide level2">
+<h2>Step 9 — Research Question</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><strong>A good RQ is…</strong></p>
+<ul>
+<li><strong>Focused</strong> — one phenomenon</li>
+<li><strong>Grounded</strong> — linked to theory</li>
+<li><strong>Falsifiable</strong> — answerable with data</li>
+<li><strong>Relevant</strong> — fills a gap</li>
+</ul>
+<p><strong>Template:</strong> &gt; <em>“How does [X] affect [Y] among [population], and does [Z] moderate this?”</em></p>
+<p><strong>Theoretical anchors:</strong></p>
+<ul>
+<li>Uppsala model (Johanson &amp; Vahlne 1977)</li>
+<li>Liability of foreignness (Zaheer 1995)</li>
+<li>SME internationalization &amp; performance (Lu &amp; Beamish 2001)</li>
+<li>Absorptive capacity (Cohen &amp; Levinthal 1990)</li>
+</ul>
+</div><div class="column" style="width:48%;">
+<p><strong>Our project’s RQ:</strong></p>
+<div class="blue-box">
+<p><em>“Does degree of internationalization (DOI) exhibit an inverted U-shaped relationship with firm performance among European SMEs, and does R&amp;D intensity moderate this relationship?”</em></p>
+</div>
+<p><strong>Theory → prediction:</strong></p>
+<p>Early DOI: learning gains + market diversification → <strong>↑ performance</strong></p>
+<p>High DOI: coordination costs + cultural distance + managerial complexity → <strong>↓ performance</strong></p>
+<p>R&amp;D-intensive firms: stronger absorptive capacity → <strong>threshold is higher</strong></p>
+</div></div>
+</section>
+<section id="step-10-hypothesis-derivation" class="slide level2">
+<h2>Step 10 — Hypothesis Derivation</h2>
+<pre><code>Theory  →  Theoretical argument  →  Testable prediction  →  Falsifiable hypothesis</code></pre>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><strong>H1 — Non-linearity (inverted U-shape)</strong></p>
+<p>Buckley &amp; Casson (1976): internalization benefits early.<br>
+Zaheer (1995): foreignness costs increase with DOI.<br>
+Lu &amp; Beamish (2001): inverted U documented in SMEs.</p>
+<div class="box">
+<p><strong>H1:</strong> DOI positively affects performance at low levels; the effect turns negative at high levels.<br>
+<em>Test:</em> β(DOI) &gt; 0 <strong>and</strong> β(DOI²) &lt; 0</p>
+</div>
+</div><div class="column" style="width:48%;">
+<p><strong>H2 — Moderation by R&amp;D intensity</strong></p>
+<p>Cohen &amp; Levinthal (1990): absorptive capacity enables firms to exploit external knowledge.<br>
+R&amp;D → stronger capacity to learn from foreign markets → sustained performance at higher DOI.</p>
+<div class="box">
+<p><strong>H2:</strong> R&amp;D intensity positively moderates the DOI–performance relationship.<br>
+<em>Test:</em> β(DOI × R&amp;D) &gt; 0</p>
+</div>
+</div></div>
+</section>
+<section id="your-readme.md" class="slide level2">
+<h2>Your README.md</h2>
+<div class="sourceCode" id="cb21"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb21-1"><a href=""></a><span class="fu"># SME Internationalization &amp; Firm Performance</span></span>
+<span id="cb21-2"><a href=""></a><span class="fu">### ExInt II | WU Vienna | SS 2026 | [Your Name]</span></span>
+<span id="cb21-3"><a href=""></a></span>
+<span id="cb21-4"><a href=""></a><span class="fu">## Research Question</span></span>
+<span id="cb21-5"><a href=""></a>Does DOI exhibit an inverted U-shaped relationship with firm performance</span>
+<span id="cb21-6"><a href=""></a>among European SMEs, and does R&amp;D intensity moderate this relationship?</span>
+<span id="cb21-7"><a href=""></a></span>
+<span id="cb21-8"><a href=""></a><span class="fu">## Hypotheses</span></span>
+<span id="cb21-9"><a href=""></a><span class="ss">- </span>**H1:** DOI positively affects performance at low levels; turns negative at high levels.</span>
+<span id="cb21-10"><a href=""></a><span class="ss">- </span>**H2:** R&amp;D intensity positively moderates the DOI–performance link.</span>
+<span id="cb21-11"><a href=""></a></span>
+<span id="cb21-12"><a href=""></a><span class="fu">## Data</span></span>
+<span id="cb21-13"><a href=""></a><span class="ss">- </span>Source: WRDS / Compustat Global</span>
+<span id="cb21-14"><a href=""></a><span class="ss">- </span>Downloaded: <span class="co">[</span><span class="ot">date</span><span class="co">]</span> | License: WRDS subscriber agreement</span>
+<span id="cb21-15"><a href=""></a><span class="ss">- </span>Sample: European SMEs (≤250 employees OR ≤€43m assets), 2005–2020</span>
+<span id="cb21-16"><a href=""></a></span>
+<span id="cb21-17"><a href=""></a><span class="fu">## How to Reproduce</span></span>
+<span id="cb21-18"><a href=""></a>git clone https://github.com/[you]/sme-internationalization</span>
+<span id="cb21-19"><a href=""></a>python -m venv .venv &amp;&amp; source .venv/bin/activate</span>
+<span id="cb21-20"><a href=""></a>pip install -r requirements.txt</span>
+<span id="cb21-21"><a href=""></a><span class="fu"># Add WRDS username to .env (see .env.example)</span></span>
+<span id="cb21-22"><a href=""></a>task all</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="session-4-checklist" class="slide level2" data-background-color="#002f5f">
+<h2>Session 4 Checklist</h2>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Task</th>
+<th>Done?</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>.venv</code> created &amp; activated</td>
+<td>☐</td>
+</tr>
+<tr class="even">
+<td>Packages installed + <code>requirements.txt</code> frozen</td>
+<td>☐</td>
+</tr>
+<tr class="odd">
+<td><code>pyproject.toml</code> with ruff config created</td>
+<td>☐</td>
+</tr>
+<tr class="even">
+<td>Full folder structure in place</td>
+<td>☐</td>
+</tr>
+<tr class="odd">
+<td><code>Taskfile.yml</code> with numbered tasks</td>
+<td>☐</td>
+</tr>
+<tr class="even">
+<td><code>.gitignore</code> (venv, data/raw, .env excluded)</td>
+<td>☐</td>
+</tr>
+<tr class="odd">
+<td>Git repo initialized + pushed to GitHub</td>
+<td>☐</td>
+</tr>
+<tr class="even">
+<td><code>.env.example</code> committed; <code>.env</code> in <code>.gitignore</code></td>
+<td>☐</td>
+</tr>
+<tr class="odd">
+<td>Zotero + Better BibTeX installed; <code>library.bib</code> auto-exporting</td>
+<td>☐</td>
+</tr>
+<tr class="even">
+<td>≥ 3 papers in Zotero</td>
+<td>☐</td>
+</tr>
+<tr class="odd">
+<td>Research question + ≥ 1 hypothesis in <code>README.md</code></td>
+<td>☐</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="looking-ahead-sessions-58" class="slide level2">
+<h2>Looking Ahead — Sessions 5–8</h2>
+<table class="caption-top">
+<colgroup>
+<col style="width: 56%">
+<col style="width: 43%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Session</th>
+<th>Focus</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Session 5</strong></td>
+<td>WRDS API · Pandas vs Polars · Parquet · Cleaning pipeline</td>
+</tr>
+<tr class="even">
+<td><strong>Session 6</strong></td>
+<td>Descriptive stats · Regex for data cleaning · Panel structure</td>
+</tr>
+<tr class="odd">
+<td><strong>Session 7</strong></td>
+<td><code>linearmodels</code> panel regression · Robustness checks · Interpretation</td>
+</tr>
+<tr class="even">
+<td><strong>Session 8</strong></td>
+<td>Quarto <code>research_note.md</code> → PDF · BibTeX · Peer review · Submission</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="resources" class="slide level2">
+<h2>Resources</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><strong>Tools</strong></p>
+<ul>
+<li><a href="https://quarto.org/docs/guide/">Quarto</a> + <a href="https://quarto.org/docs/gallery/">Gallery</a></li>
+<li><a href="https://retorque.re/zotero-better-bibtex/">Zotero + Better BibTeX</a></li>
+<li><a href="https://docs.astral.sh/ruff/">ruff docs</a></li>
+<li><a href="https://github.com/astral-sh/uv">uv — fast package manager</a></li>
+<li><a href="https://wrds-www.wharton.upenn.edu/pages/support/programming-wrds/programming-python/">WRDS Python API</a></li>
+<li><a href="https://taskfile.dev/">Taskfile</a></li>
+</ul>
+<p><strong>Reading</strong></p>
+<ul>
+<li><a href="https://book.the-turing-way.org/">The Turing Way</a> — reproducible research handbook</li>
+<li><a href="https://www.nature.com/articles/s41597-022-01143-6">Trisovic et al.&nbsp;(2022)</a> — code quality study</li>
+<li><em>Python for Data Analysis</em> (McKinney) — pandas</li>
+<li><a href="https://docs.pola.rs/">Polars docs</a></li>
+</ul>
+</div><div class="column" style="width:48%;">
+<p><strong>Seed your <code>library.bib</code> with these:</strong></p>
+<ul>
+<li>Johanson &amp; Vahlne (1977) — Uppsala model</li>
+<li>Zaheer (1995) — Liability of foreignness</li>
+<li>Lu &amp; Beamish (2001) — SME internationalization</li>
+<li>Buckley &amp; Casson (1976) — Internalization theory</li>
+<li>Cohen &amp; Levinthal (1990) — Absorptive capacity</li>
+<li>Sullivan (1994) — Measuring DOI</li>
+</ul>
+<div class="blue-box">
+<p>📁 Example project:<br>
+<code>github.com/[instructor]/exint2-example-project</code></p>
+<p>Clone it → <code>task all</code> → read the code.</p>
+</div>
+</div></div>
+
+</section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+<p>ExInt II · WU Vienna · SS 2026</p>
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="session04_slides_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="session04_slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="session04_slides_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="session04_slides_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="session04_slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="session04_slides_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="session04_slides_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="session04_slides_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="session04_slides_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="session04_slides_files/libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'fade',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1280,
+
+        height: 720,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        math: {
+          mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <script id="quarto-html-after-body" type="application/javascript">
+    window.document.addEventListener("DOMContentLoaded", function (event) {
+      const toggleBodyColorMode = (bsSheetEl) => {
+        const mode = bsSheetEl.getAttribute("data-mode");
+        const bodyEl = window.document.querySelector("body");
+        if (mode === "dark") {
+          bodyEl.classList.add("quarto-dark");
+          bodyEl.classList.remove("quarto-light");
+        } else {
+          bodyEl.classList.add("quarto-light");
+          bodyEl.classList.remove("quarto-dark");
+        }
+      }
+      const toggleBodyColorPrimary = () => {
+        const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+        if (bsSheetEl) {
+          toggleBodyColorMode(bsSheetEl);
+        }
+      }
+      toggleBodyColorPrimary();  
+      const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+      tabsets.forEach(function(tabset) {
+        const tabby = new Tabby('#' + tabset.id);
+      });
+      const isCodeAnnotation = (el) => {
+        for (const clz of el.classList) {
+          if (clz.startsWith('code-annotation-')) {                     
+            return true;
+          }
+        }
+        return false;
+      }
+      const onCopySuccess = function(e) {
+        // button target
+        const button = e.trigger;
+        // don't keep focus
+        button.blur();
+        // flash "checked"
+        button.classList.add('code-copy-button-checked');
+        var currentTitle = button.getAttribute("title");
+        button.setAttribute("title", "Copied!");
+        let tooltip;
+        if (window.bootstrap) {
+          button.setAttribute("data-bs-toggle", "tooltip");
+          button.setAttribute("data-bs-placement", "left");
+          button.setAttribute("data-bs-title", "Copied!");
+          tooltip = new bootstrap.Tooltip(button, 
+            { trigger: "manual", 
+              customClass: "code-copy-button-tooltip",
+              offset: [0, -8]});
+          tooltip.show();    
+        }
+        setTimeout(function() {
+          if (tooltip) {
+            tooltip.hide();
+            button.removeAttribute("data-bs-title");
+            button.removeAttribute("data-bs-toggle");
+            button.removeAttribute("data-bs-placement");
+          }
+          button.setAttribute("title", currentTitle);
+          button.classList.remove('code-copy-button-checked');
+        }, 1000);
+        // clear code selection
+        e.clearSelection();
+      }
+      const getTextToCopy = function(trigger) {
+          const codeEl = trigger.previousElementSibling.cloneNode(true);
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+      }
+      const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+        text: getTextToCopy
+      });
+      clipboard.on('success', onCopySuccess);
+      if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+        const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+          text: getTextToCopy,
+          container: window.document.getElementById('quarto-embedded-source-code-modal')
+        });
+        clipboardModal.on('success', onCopySuccess);
+      }
+        var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+        var mailtoRegex = new RegExp(/^mailto:/);
+          var filterRegex = new RegExp('/' + window.location.host + '/');
+        var isInternal = (href) => {
+            return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+        }
+        // Inspect non-navigation links and adorn them if external
+     	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+        for (var i=0; i<links.length; i++) {
+          const link = links[i];
+          if (!isInternal(link.href)) {
+            // undo the damage that might have been done by quarto-nav.js in the case of
+            // links that we want to consider external
+            if (link.dataset.originalHref !== undefined) {
+              link.href = link.dataset.originalHref;
+            }
+          }
+        }
+      function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+        const config = {
+          allowHTML: true,
+          maxWidth: 500,
+          delay: 100,
+          arrow: false,
+          appendTo: function(el) {
+              return el.closest('section.slide') || el.parentElement;
+          },
+          interactive: true,
+          interactiveBorder: 10,
+          theme: 'light-border',
+          placement: 'bottom-start',
+        };
+        if (contentFn) {
+          config.content = contentFn;
+        }
+        if (onTriggerFn) {
+          config.onTrigger = onTriggerFn;
+        }
+        if (onUntriggerFn) {
+          config.onUntrigger = onUntriggerFn;
+        }
+          config['offset'] = [0,0];
+          config['maxWidth'] = 700;
+        window.tippy(el, config); 
+      }
+      const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+      for (var i=0; i<noterefs.length; i++) {
+        const ref = noterefs[i];
+        tippyHover(ref, function() {
+          // use id or data attribute instead here
+          let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+          try { href = new URL(href).hash; } catch {}
+          const id = href.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note) {
+            return note.innerHTML;
+          } else {
+            return "";
+          }
+        });
+      }
+      const findCites = (el) => {
+        const parentEl = el.parentElement;
+        if (parentEl) {
+          const cites = parentEl.dataset.cites;
+          if (cites) {
+            return {
+              el,
+              cites: cites.split(' ')
+            };
+          } else {
+            return findCites(el.parentElement)
+          }
+        } else {
+          return undefined;
+        }
+      };
+      var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+      for (var i=0; i<bibliorefs.length; i++) {
+        const ref = bibliorefs[i];
+        const citeInfo = findCites(ref);
+        if (citeInfo) {
+          tippyHover(citeInfo.el, function() {
+            var popup = window.document.createElement('div');
+            citeInfo.cites.forEach(function(cite) {
+              var citeDiv = window.document.createElement('div');
+              citeDiv.classList.add('hanging-indent');
+              citeDiv.classList.add('csl-entry');
+              var biblioDiv = window.document.getElementById('ref-' + cite);
+              if (biblioDiv) {
+                citeDiv.innerHTML = biblioDiv.innerHTML;
+              }
+              popup.appendChild(citeDiv);
+            });
+            return popup.innerHTML;
+          });
+        }
+      }
+    });
+    </script>
+    
+
+</body></html>

@@ -1,0 +1,712 @@
+---
+title: "Reproducible Research Setup"
+subtitle: "Session 4 — ExInt II: Research Designs in SME Research"
+author: "WU Vienna | SS 2026"
+date: "May 6, 2026"
+format:
+  revealjs:
+    theme: default
+    slide-number: true
+    footer: "ExInt II · WU Vienna · SS 2026"
+    transition: fade
+    highlight-style: github
+    code-line-numbers: true
+    width: 1280
+    height: 720
+    css: |
+      :root { --wu-blue: #002f5f; --wu-red: #c8102e; }
+      .reveal h1, .reveal h2 { color: var(--wu-blue); }
+      .reveal h3 { color: var(--wu-red); font-size: 0.95em; }
+      .box {
+        border-left: 4px solid var(--wu-red);
+        background: #f8f8f8;
+        padding: 0.5em 1em;
+        border-radius: 4px;
+        margin: 0.4em 0;
+        font-size: 0.87em;
+      }
+      .blue-box {
+        border: 2px solid var(--wu-blue);
+        background: #eef3f9;
+        padding: 0.6em 1em;
+        border-radius: 6px;
+        margin: 0.4em 0;
+        font-size: 0.87em;
+      }
+      .small { font-size: 0.80em; }
+      .tiny  { font-size: 0.68em; }
+      table { font-size: 0.78em; }
+execute:
+  echo: true
+  eval: false
+---
+
+## Today at a Glance {background-color="#002f5f"}
+
+::: {.columns}
+::: {.column width="55%"}
+**What we cover**
+
+1. Why reproducible research?
+2. Python environment setup — live
+3. Project folder structure + Taskfile
+4. Code quality: ruff (linting & formatting)
+5. Git & GitHub
+6. Zotero + Quarto
+7. Research question & hypothesis
+:::
+::: {.column width="42%"}
+**End-of-session deliverable**
+
+::: {.blue-box}
+✅ Working Python environment  
+✅ Project on GitHub with full structure  
+✅ Zotero + `library.bib` auto-export  
+✅ Research question + hypothesis in `README.md`
+:::
+:::
+:::
+
+---
+
+## The Problem: Code Does Not Run
+
+::: {.columns}
+::: {.column width="56%"}
+**Large-scale study on research code quality**  
+[Nature Scientific Data, 2022](https://www.nature.com/articles/s41597-022-01143-6)
+
+Analysis of 2,000+ replication datasets with 9,000+ R files (2010–2020):
+
+- **74%** failed on first run
+- **56%** failed even after automated code cleaning
+
+Most common causes: missing packages, hardcoded paths, wrong execution order
+
+::: {.box}
+The same failure modes apply to Python. This course teaches you to avoid all of them.
+:::
+:::
+::: {.column width="42%"}
+**You run your analysis, submit the paper.**  
+One year later, you need to extend it.
+
+Problems you will face:
+
+- Python package APIs changed → code breaks
+- You forgot the sequence of steps
+- Your collaborator can't run it at all
+
+→ Every problem has a fix. We implement them today.
+:::
+:::
+
+---
+
+## Five Fixes for Reproducibility
+
+| Problem | Fix |
+|---------|-----|
+| Hardcoded absolute paths (`C:/user/data/file.csv`) | Use **relative paths** (`data/file.csv`) |
+| Unclear which packages & versions | `pip freeze > requirements.txt` |
+| Scripts run in wrong order | **Taskfile** with numbered dependencies |
+| Code untested on clean machine | Test in fresh **venv** before sharing |
+| Proprietary software | Use **free & open-source** tools |
+
+::: {.box}
+Source: [Trisovic et al. (2022), Nature Scientific Data](https://www.nature.com/articles/s41597-022-01143-6)
+:::
+
+**Four pillars of a reproducible project:**  
+Version control (Git) · Consistent structure · Documentation (README) · Automation (Taskfile)
+
+---
+
+## Tools We Use in This Course {background-color="#f0f4f9"}
+
+| Tool | Purpose |
+|------|---------|
+| **VS Code** / JupyterLab | IDE |
+| **venv** | Python environment isolation |
+| **pip** / **uv** | Package management |
+| **ruff** | Linting + formatting (replaces flake8 + Black + isort) |
+| **pyproject.toml** | Project configuration |
+| **Taskfile** | Automation — correct script execution order |
+| **Git + GitHub** | Version control |
+| **Zotero + Better BibTeX** | Reference management → `library.bib` |
+| **Quarto** | Render `research_note.md` → PDF / HTML |
+| **WRDS Python API** | Data access (Compustat Global) |
+
+---
+
+## Step 1 — Virtual Environment: venv {background-color="#f0f4f9"}
+
+::: {.columns}
+::: {.column width="50%"}
+**venv vs conda**
+
+| | **venv** | **conda** |
+|--|--|--|
+| Built-in | ✅ | ❌ (install separately) |
+| Lightweight | ✅ | ❌ |
+| Own Python per env | ❌ | ✅ |
+| Non-Python deps | ❌ | ✅ (R, C libs) |
+| For this course | ✅ sufficient | Optional |
+
+::: {.box}
+Use `.venv` as the folder name — VS Code detects it automatically, and GitHub's Python `.gitignore` template excludes it automatically.
+:::
+:::
+::: {.column width="48%"}
+```bash
+# 1. Create virtual environment
+python -m venv .venv
+
+# 2. Activate (Mac / Linux)
+source .venv/bin/activate
+
+# 2. Activate (Windows)
+.venv\Scripts\activate
+
+# 3. Install packages
+pip install pandas statsmodels \
+  linearmodels wrds matplotlib \
+  seaborn jupyterlab ruff
+
+# 4. Freeze exact versions
+pip freeze > requirements.txt
+
+# 5. Deactivate when done
+deactivate
+```
+:::
+:::
+
+---
+
+## Step 2 — Package Managers
+
+::: {.columns}
+::: {.column width="50%"}
+### pip (default, always available)
+```bash
+pip install pandas
+pip install -r requirements.txt  # reproduce
+pip freeze > requirements.txt    # export
+```
+
+### uv (modern — written in Rust, very fast)
+```bash
+pip install uv
+uv pip install pandas
+uv pip freeze > requirements.txt
+```
+
+::: {.box}
+**Why pinned versions matter:**  
+`statsmodels` 0.13 → 0.14 changed default standard errors. Without `requirements.txt`, your results may not reproduce — even on your own machine next year.
+:::
+:::
+::: {.column width="48%"}
+```txt
+# requirements.txt (example)
+pandas==2.2.1
+numpy==1.26.4
+statsmodels==0.14.1
+linearmodels==5.4
+matplotlib==3.8.3
+seaborn==0.13.2
+wrds==3.2.0
+python-dotenv==1.0.1
+jupyterlab==4.1.5
+ruff==0.4.2
+```
+
+Anyone can now reproduce your environment exactly:
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+:::
+:::
+
+---
+
+## Step 3 — Code Quality: ruff
+
+::: {.columns}
+::: {.column width="52%"}
+**Linters** detect problems before you run code:
+
+- `flake8` — style + error checking
+- `pylint` — deeper analysis
+- `mypy` — static type checking
+- **`ruff`** — replaces all of the above + formatting
+
+**Formatters** auto-format your code:
+
+- `Black` — opinionated formatter
+- `isort` — sorts import statements
+- **`ruff`** — does both
+
+::: {.box}
+💡 Install only `ruff`. One tool, written in Rust, replaces flake8 + Black + isort. Orders of magnitude faster.
+:::
+:::
+::: {.column width="46%"}
+```bash
+# Check for issues
+ruff check code/
+
+# Auto-fix issues
+ruff check --fix code/
+
+# Format code
+ruff format code/
+```
+
+**`pyproject.toml`** (minimal config):
+```toml
+[project]
+name = "sme-internationalization"
+requires-python = ">=3.10"
+
+[tool.ruff]
+line-length = 88
+exclude = [".venv"]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+```
+:::
+:::
+
+---
+
+## Step 4 — Project Structure
+
+```
+sme-internationalization/           ← Git repository root
+│
+├── data/
+│   ├── raw/           ← NEVER edit. Downloaded from WRDS. Not tracked by Git.
+│   └── processed/     ← Output of cleaning scripts. Can be regenerated.
+│
+├── code/
+│   ├── 01_pull_data.py       ← WRDS API pull
+│   ├── 02_clean.py           ← Cleaning & variable construction
+│   ├── 03_descriptives.py    ← Summary stats & figures
+│   └── 04_regression.py      ← Panel regressions (linearmodels)
+│
+├── output/
+│   ├── tables/    ← .csv regression tables
+│   └── figures/   ← .png plots
+│
+├── references/
+│   └── library.bib   ← auto-exported from Zotero (Better BibTeX)
+│
+├── research_note.md   ← main output (Quarto → PDF)
+├── Taskfile.yml       ← automation: run scripts in order
+├── pyproject.toml     ← project config + ruff settings
+├── requirements.txt   ← pinned package versions
+├── .env.example       ← WRDS credentials template
+├── .gitignore
+└── README.md
+```
+
+---
+
+## Step 5 — Automation with Taskfile
+
+```bash
+pip install go-task-bin
+```
+
+**`Taskfile.yml`** — enforces the correct execution order:
+
+```yaml
+version: '3'
+
+tasks:
+  pull:
+    cmds:
+      - python code/01_pull_data.py
+
+  clean:
+    deps: [pull]
+    cmds:
+      - python code/02_clean.py
+
+  descriptives:
+    deps: [clean]
+    cmds:
+      - python code/03_descriptives.py
+
+  regression:
+    deps: [descriptives]
+    cmds:
+      - python code/04_regression.py
+
+  all:
+    deps: [regression]
+```
+
+```bash
+task all         # runs the full pipeline
+task regression  # runs only regression (+ its deps)
+```
+
+::: {.box}
+Anyone cloning your repo runs `task all` — one command, correct order, reproducible.
+:::
+
+---
+
+## Step 6 — Git & GitHub {background-color="#f0f4f9"}
+
+::: {.columns}
+::: {.column width="50%"}
+**Initialize & push**
+```bash
+git init
+git add .
+git commit -m "initial project structure"
+
+git remote add origin https://github.com/[you]/sme-intl
+git push -u origin main
+```
+
+**Daily commands**
+```bash
+git status                  # what changed?
+git diff --color-words      # exact changes
+git commit -am "message"    # add + commit tracked
+git log --oneline --graph   # visual history
+git stash                   # shelve changes temporarily
+git reset --soft HEAD~1     # undo last commit, keep changes
+git reset --hard origin/main # reset to GitHub state
+```
+:::
+::: {.column width="48%"}
+**`.gitignore`**
+```gitignore
+# Virtual environment
+.venv/
+
+# Raw data (licensing; large files)
+data/raw/
+
+# Credentials — NEVER commit!
+.env
+
+# Reference PDFs (managed by Zotero)
+references/*.pdf
+
+# Python cache
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# OS files
+.DS_Store
+Thumbs.db
+```
+
+::: {.box}
+🔐 **WRDS credentials go in `.env`** (not in code). `.env` is in `.gitignore`. Share `.env.example` instead.
+:::
+:::
+:::
+
+---
+
+## Step 7 — Pandas or Polars?
+
+::: {.columns}
+::: {.column width="50%"}
+**For this project: pandas**
+
+- Time series data (firm-years) → pandas aligns on index automatically
+- `statsmodels` and `linearmodels` expect pandas DataFrames
+- Larger ecosystem, more Stack Overflow answers
+
+**Pandas index trap** (know this!):
+```python
+df = pd.DataFrame({'Customer': ['A','B','C','D','E'],
+                   'Sales': [100,500,200,600,300]})
+high = df[df['Sales'] > 400].copy()
+
+# ✅ Works: scores is a plain list
+high['Score'] = [10, 20]
+
+# ❌ Silent bug: pandas aligns on original index
+high['Score'] = pd.Series([10, 20])
+# Fix:
+high.reset_index(drop=True, inplace=True)
+high['Score'] = pd.Series([10, 20])
+```
+:::
+::: {.column width="48%"}
+**When to use Polars instead:**
+
+- Large datasets (millions of rows) → much faster
+- General data transformation (no time series alignment needed)
+- Written in Rust; lazy evaluation
+
+**Save your cleaned data as Parquet:**
+```python
+import pandas as pd
+
+df.to_parquet("data/processed/panel_clean.parquet")
+df = pd.read_parquet("data/processed/panel_clean.parquet")
+```
+
+::: {.box}
+**Parquet vs CSV:** Parquet is columnar, compressed, schema-aware, and 10–100× faster to read/write for large datasets. Use it for anything you'll re-read often.
+:::
+:::
+:::
+
+---
+
+## Step 8 — Reference Management with Zotero
+
+::: {.columns}
+::: {.column width="55%"}
+**Setup (once, ~10 minutes)**
+
+1. Download [Zotero](https://www.zotero.org/) + browser connector
+2. Install **Better BibTeX** plugin
+3. Point Zotero storage → `references/` in your project
+4. Configure auto-export → `references/library.bib`
+
+**Daily workflow**
+
+- Find paper → click browser connector
+- PDF saved to `references/` automatically
+- `library.bib` updates without any manual step
+:::
+::: {.column width="43%"}
+**Cite in `research_note.md`:**
+```yaml
+---
+title: "SME Internationalization"
+bibliography: references/library.bib
+---
+```
+```markdown
+SMEs face liability of foreignness
+[@Zaheer1995], which increases with
+internationalization [@Lu2001].
+```
+
+**Render with Quarto:**
+```bash
+quarto render research_note.md
+# → research_note.pdf
+# → research_note.html
+```
+
+::: {.box}
+Docs: [quarto.org/docs/guide](https://quarto.org/docs/guide/)  
+Gallery: [quarto.org/docs/gallery](https://quarto.org/docs/gallery/)
+:::
+:::
+:::
+
+---
+
+## Jupyter vs Quarto — When to Use Which
+
+| | **JupyterLab** | **Quarto `.md`** |
+|---|---|---|
+| Format | `.ipynb` (JSON blob) | Plain text — clean Git diffs |
+| Best for | Exploration & prototyping | Final reproducible output |
+| BibTeX citations | ❌ not built-in | ✅ native |
+| Renders to | HTML | PDF, HTML, Word, slides |
+| Version control | ❌ messy diffs | ✅ |
+
+::: {.box}
+**Recommended workflow:**  
+Explore in JupyterLab → finalize pipeline as numbered `.py` scripts → write `research_note.md` in Quarto → `task all` runs everything.
+:::
+
+Other tools worth knowing: **marimo** (reactive Python notebooks), **knitr** (R equivalent of Quarto)
+
+---
+
+## Step 9 — Research Question
+
+::: {.columns}
+::: {.column width="50%"}
+**A good RQ is...**
+
+- **Focused** — one phenomenon
+- **Grounded** — linked to theory
+- **Falsifiable** — answerable with data
+- **Relevant** — fills a gap
+
+**Template:**
+> *"How does [X] affect [Y] among [population], and does [Z] moderate this?"*
+
+**Theoretical anchors:**
+
+- Uppsala model (Johanson & Vahlne 1977)
+- Liability of foreignness (Zaheer 1995)
+- SME internationalization & performance (Lu & Beamish 2001)
+- Absorptive capacity (Cohen & Levinthal 1990)
+:::
+::: {.column width="48%"}
+**Our project's RQ:**
+
+::: {.blue-box}
+*"Does degree of internationalization (DOI) exhibit an inverted U-shaped relationship with firm performance among European SMEs, and does R&D intensity moderate this relationship?"*
+:::
+
+**Theory → prediction:**
+
+Early DOI: learning gains + market diversification → **↑ performance**
+
+High DOI: coordination costs + cultural distance + managerial complexity → **↓ performance**
+
+R&D-intensive firms: stronger absorptive capacity → **threshold is higher**
+:::
+:::
+
+---
+
+## Step 10 — Hypothesis Derivation
+
+```
+Theory  →  Theoretical argument  →  Testable prediction  →  Falsifiable hypothesis
+```
+
+::: {.columns}
+::: {.column width="50%"}
+**H1 — Non-linearity (inverted U-shape)**
+
+Buckley & Casson (1976): internalization benefits early.  
+Zaheer (1995): foreignness costs increase with DOI.  
+Lu & Beamish (2001): inverted U documented in SMEs.
+
+::: {.box}
+**H1:** DOI positively affects performance at low levels; the effect turns negative at high levels.  
+*Test:* β(DOI) > 0 **and** β(DOI²) < 0
+:::
+:::
+::: {.column width="48%"}
+**H2 — Moderation by R&D intensity**
+
+Cohen & Levinthal (1990): absorptive capacity enables firms to exploit external knowledge.  
+R&D → stronger capacity to learn from foreign markets → sustained performance at higher DOI.
+
+::: {.box}
+**H2:** R&D intensity positively moderates the DOI–performance relationship.  
+*Test:* β(DOI × R&D) > 0
+:::
+:::
+:::
+
+---
+
+## Your README.md
+
+```markdown
+# SME Internationalization & Firm Performance
+### ExInt II | WU Vienna | SS 2026 | [Your Name]
+
+## Research Question
+Does DOI exhibit an inverted U-shaped relationship with firm performance
+among European SMEs, and does R&D intensity moderate this relationship?
+
+## Hypotheses
+- **H1:** DOI positively affects performance at low levels; turns negative at high levels.
+- **H2:** R&D intensity positively moderates the DOI–performance link.
+
+## Data
+- Source: WRDS / Compustat Global
+- Downloaded: [date] | License: WRDS subscriber agreement
+- Sample: European SMEs (≤250 employees OR ≤€43m assets), 2005–2020
+
+## How to Reproduce
+git clone https://github.com/[you]/sme-internationalization
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+# Add WRDS username to .env (see .env.example)
+task all
+```
+
+---
+
+## Session 4 Checklist {background-color="#002f5f"}
+
+| Task | Done? |
+|------|-------|
+| `.venv` created & activated | ☐ |
+| Packages installed + `requirements.txt` frozen | ☐ |
+| `pyproject.toml` with ruff config created | ☐ |
+| Full folder structure in place | ☐ |
+| `Taskfile.yml` with numbered tasks | ☐ |
+| `.gitignore` (venv, data/raw, .env excluded) | ☐ |
+| Git repo initialized + pushed to GitHub | ☐ |
+| `.env.example` committed; `.env` in `.gitignore` | ☐ |
+| Zotero + Better BibTeX installed; `library.bib` auto-exporting | ☐ |
+| ≥ 3 papers in Zotero | ☐ |
+| Research question + ≥ 1 hypothesis in `README.md` | ☐ |
+
+---
+
+## Looking Ahead — Sessions 5–8
+
+| Session | Focus |
+|---------|-------|
+| **Session 5** | WRDS API · Pandas vs Polars · Parquet · Cleaning pipeline |
+| **Session 6** | Descriptive stats · Regex for data cleaning · Panel structure |
+| **Session 7** | `linearmodels` panel regression · Robustness checks · Interpretation |
+| **Session 8** | Quarto `research_note.md` → PDF · BibTeX · Peer review · Submission |
+
+---
+
+## Resources
+
+::: {.columns}
+::: {.column width="50%"}
+**Tools**
+
+- [Quarto](https://quarto.org/docs/guide/) + [Gallery](https://quarto.org/docs/gallery/)
+- [Zotero + Better BibTeX](https://retorque.re/zotero-better-bibtex/)
+- [ruff docs](https://docs.astral.sh/ruff/)
+- [uv — fast package manager](https://github.com/astral-sh/uv)
+- [WRDS Python API](https://wrds-www.wharton.upenn.edu/pages/support/programming-wrds/programming-python/)
+- [Taskfile](https://taskfile.dev/)
+
+**Reading**
+
+- [The Turing Way](https://book.the-turing-way.org/) — reproducible research handbook
+- [Trisovic et al. (2022)](https://www.nature.com/articles/s41597-022-01143-6) — code quality study
+- *Python for Data Analysis* (McKinney) — pandas
+- [Polars docs](https://docs.pola.rs/)
+:::
+::: {.column width="48%"}
+**Seed your `library.bib` with these:**
+
+- Johanson & Vahlne (1977) — Uppsala model
+- Zaheer (1995) — Liability of foreignness
+- Lu & Beamish (2001) — SME internationalization
+- Buckley & Casson (1976) — Internalization theory
+- Cohen & Levinthal (1990) — Absorptive capacity
+- Sullivan (1994) — Measuring DOI
+
+::: {.blue-box}
+📁 Example project:  
+`github.com/[instructor]/exint2-example-project`
+
+Clone it → `task all` → read the code.
+:::
+:::
+:::

@@ -1,0 +1,30 @@
+[project]
+name = "sme-internationalization"
+version = "0.1.0"
+description = "DOI and firm performance among European SMEs — ExInt II WU Vienna SS 2026"
+requires-python = ">=3.10"
+dependencies = [
+  "pandas>=2.2.0",
+  "numpy>=1.26.0",
+  "statsmodels>=0.14.0",
+  "linearmodels>=5.4",
+  "matplotlib>=3.8.0",
+  "seaborn>=0.13.0",
+  "wrds>=3.2.0",
+  "python-dotenv>=1.0.0",
+]
+
+# ── Ruff: linting + formatting (replaces flake8 + Black + isort) ──────────────
+[tool.ruff]
+line-length = 88
+indent-width = 4
+exclude = [".venv", "__pycache__"]
+
+[tool.ruff.lint]
+# E4: import errors, E7: statement errors, E9: runtime errors, F: pyflakes
+select = ["E4", "E7", "E9", "F"]
+ignore = []
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
