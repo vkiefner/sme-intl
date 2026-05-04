@@ -49,7 +49,7 @@
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/[instructor]/exint2-example-project
+git clone https://github.com/vkiefner/sme-intl
 cd exint2-example-project
 
 # 2. Create and activate virtual environment
