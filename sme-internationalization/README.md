@@ -109,7 +109,7 @@ Buckley, P. J., & Casson, M. (1976). *The future of the multinational enterprise
 
 Cohen, W. M., & Levinthal, D. A. (1990). Absorptive capacity: A new perspective on learning and innovation. *Administrative Science Quarterly*, 35(1), 128–152.
 
-Johanson, J., & Vahlne, J.-E. (1977). The internationalization process of the firm. *Journal of International Business Studies*, 8(1), 23–32.
+Johanson, J., & Vahlne, J.-E. (1977). The Internationalization Process of the Firm—A Model of Knowledge Development and Increasing Foreign Market Commitments. *Journal of International Business Studies*, 8(1), 23–32.
 
 Lu, J. W., & Beamish, P. W. (2001). The internationalization and performance of SMEs. *Strategic Management Journal*, 22(6–7), 565–586.
 
