@@ -24,8 +24,7 @@ load_dotenv()  # reads WRDS_USERNAME from .env
 WRDS_USER = os.getenv("WRDS_USERNAME")
 if not WRDS_USER:
     raise EnvironmentError(
-        "WRDS_USERNAME not set.\n"
-        "Copy .env.example → .env and fill in your username."
+        "WRDS_USERNAME not set.\n" "Copy .env.example → .env and fill in your username."
     )
 
 # ── Output path — relative, never absolute ────────────────────────────────────
@@ -89,6 +88,7 @@ print(f"\nSaved to {OUT_PATH}")
 # Document download metadata (source, date, license)
 meta = OUT_PATH.with_suffix(".meta.txt")
 from datetime import date
+
 meta.write_text(
     f"Source: WRDS Compustat Global (comp_global_daily.g_funda)\n"
     f"Downloaded: {date.today().isoformat()}\n"
