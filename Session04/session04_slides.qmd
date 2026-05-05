@@ -54,12 +54,14 @@ execute:
 5. Git & GitHub
 6. Zotero + Quarto
 7. Research question & hypothesis
+
+[Project](https://github.com/vkiefner/sme-intl/) 
 :::
 ::: {.column width="42%"}
 **End-of-session deliverable**
 
 ::: {.blue-box}
-✅ Working Python environment  
+✅ Working Python environment
 ✅ Project on GitHub with full structure  
 ✅ Zotero + `library.bib` auto-export  
 ✅ Research question + hypothesis in `README.md`
