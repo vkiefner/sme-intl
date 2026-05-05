@@ -1,7 +1,6 @@
 # SME Internationalization & Firm Performance
 ### ExInt II: Research Designs in SME Research | WU Vienna | SS 2026
 
----
 
 ## Research Question
 
