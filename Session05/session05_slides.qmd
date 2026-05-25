@@ -1,0 +1,753 @@
+---
+title: "Data Access & Python Foundations"
+subtitle: "Session 5 — ExInt II: Research Designs in SME Research"
+author: "WU Vienna | SS 2026"
+date: "May 2026"
+format:
+  revealjs:
+    theme: default
+    slide-number: true
+    footer: "ExInt II · WU Vienna · SS 2026"
+    transition: fade
+    highlight-style: github
+    code-line-numbers: true
+    width: 1280
+    height: 720
+    css: |
+      :root { --wu-blue: #002f5f; --wu-red: #c8102e; }
+      .reveal h1, .reveal h2 { color: var(--wu-blue); }
+      .reveal h3 { color: var(--wu-red); font-size: 0.95em; }
+      .box {
+        border-left: 4px solid var(--wu-red);
+        background: #f8f8f8;
+        padding: 0.5em 1em;
+        border-radius: 4px;
+        margin: 0.4em 0;
+        font-size: 0.87em;
+      }
+      .blue-box {
+        border: 2px solid var(--wu-blue);
+        background: #eef3f9;
+        padding: 0.6em 1em;
+        border-radius: 6px;
+        margin: 0.4em 0;
+        font-size: 0.87em;
+      }
+      .output-box {
+        background: #1e1e2e;
+        color: #cdd6f4;
+        padding: 0.5em 1em;
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 0.82em;
+        margin-top: 0.2em;
+      }
+      .small { font-size: 0.80em; }
+      .tiny  { font-size: 0.68em; }
+      table  { font-size: 0.78em; }
+      .green { color: #3B6D11; }
+      .red   { color: var(--wu-red); }
+execute:
+  echo: true
+  eval: false
+---
+
+## Today at a Glance {background-color="#002f5f"}
+
+::: {.columns}
+::: {.column width="55%"}
+**What we cover**
+
+1. Interactive help in the Python shell
+2. Core data types & variables
+3. Common syntax structures
+4. Built-in & math functions
+5. String methods
+6. Lists, tuples & dictionaries
+7. File methods
+8. Live: `01_pull_data.py` — WRDS pull
+9. Live: `02_clean.py` — panel construction
+
+**Example project**  
+[github.com/vkiefner/sme-intl](https://github.com/vkiefner/sme-intl/){target="_blank"}
+:::
+::: {.column width="42%"}
+**End-of-session deliverable**
+
+::: {.blue-box}
+✅ Python basics working in your shell  
+✅ `01_pull_data.py` runs → data in `data/raw/`  
+✅ `02_clean.py` runs → panel in `data/processed/`  
+✅ Both scripts committed and pushed to GitHub
+:::
+:::
+:::
+
+---
+
+## Getting Help in Python {background-color="#f0f4f9"}
+
+### The interactive shell is your best friend
+
+Open the Python shell: in your terminal, type `python` and press Enter.
+
+```python
+# Get help on any object, function or module
+help(str)          # full docs for strings
+help(len)          # docs for the len() function
+help(list.append)  # docs for a specific method
+```
+
+```python
+# See all available methods on an object
+dir("hello")       # all string methods
+dir([1, 2, 3])     # all list methods
+dir(42)            # all int methods
+```
+
+```python
+# Quick type check
+type(42)           # <class 'int'>
+type("hello")      # <class 'str'>
+type([1, 2])       # <class 'list'>
+type({"a": 1})     # <class 'dict'>
+```
+
+::: {.box}
+💡 `help()` and `dir()` work on **everything** in Python — objects, functions, modules, packages. Use them constantly.
+:::
+
+---
+
+## Core Data Types
+
+::: {.columns}
+::: {.column width="50%"}
+```python
+# Integer
+x = 42
+type(x)          # <class 'int'>
+
+# Float
+pi = 3.14159
+type(pi)         # <class 'float'>
+
+# String
+name = "SME"
+type(name)       # <class 'str'>
+
+# Boolean
+flag = True
+type(flag)       # <class 'bool'>
+
+# None (missing value)
+result = None
+type(result)     # <class 'NoneType'>
+```
+:::
+::: {.column width="48%"}
+```python
+# Type conversion (casting)
+int("42")        # 42
+float("3.14")    # 3.14
+str(42)          # "42"
+bool(0)          # False
+bool(1)          # True
+bool("")         # False  ← empty string
+bool("text")     # True
+```
+
+::: {.box}
+**In research code**, always check types when loading data — a column of numbers read from CSV often comes in as `str`, not `int` or `float`. Use `df.dtypes` in pandas to verify.
+:::
+:::
+:::
+
+---
+
+## Variables & Assignment
+
+```python
+# Assignment — no type declaration needed
+firm_name   = "Bosch"
+employees   = 429000
+revenue     = 91.6          # in billion EUR
+is_sme      = False
+
+# Multiple assignment
+x = y = z = 0
+
+# Swap values (Python-style, no temp variable needed)
+a, b = 1, 2
+a, b = b, a                 # a=2, b=1
+
+# Augmented assignment
+count  = 0
+count += 1                  # count = count + 1
+count *= 2                  # count = count * 2
+```
+
+::: {.box}
+**Naming conventions** (follow these in your scripts):
+
+- Variables and functions: `snake_case` → `firm_size`, `pull_data()`
+- Constants: `UPPER_CASE` → `WRDS_USERNAME`, `START_YEAR`
+- Never use reserved words: `list`, `str`, `type`, `id`, `input`
+:::
+
+---
+
+## Common Syntax Structures
+
+::: {.columns}
+::: {.column width="50%"}
+### Conditionals
+```python
+doi = 0.35
+
+if doi > 0.5:
+    print("High internationalization")
+elif doi > 0.2:
+    print("Medium internationalization")
+else:
+    print("Low internationalization")
+```
+
+### For loops
+```python
+countries = ["AUT", "DEU", "CHE"]
+
+for country in countries:
+    print(f"Processing: {country}")
+
+# Loop with index
+for i, country in enumerate(countries):
+    print(f"{i}: {country}")
+```
+:::
+::: {.column width="48%"}
+### While loops
+```python
+attempts = 0
+max_attempts = 3
+
+while attempts < max_attempts:
+    print(f"Attempt {attempts + 1}")
+    attempts += 1
+```
+
+### List comprehensions
+```python
+# Traditional loop
+squares = []
+for n in range(5):
+    squares.append(n ** 2)
+
+# List comprehension (Pythonic)
+squares = [n ** 2 for n in range(5)]
+# [0, 1, 4, 9, 16]
+
+# With condition
+even = [n for n in range(10) if n % 2 == 0]
+# [0, 2, 4, 6, 8]
+```
+:::
+:::
+
+---
+
+## Functions
+
+```python
+# Define a function
+def winsorize(value, lower, upper):
+    """Clip a value between lower and upper bounds."""
+    return max(lower, min(upper, value))
+
+# Call it
+winsorize(150, 0, 100)    # returns 100
+winsorize(-5,  0, 100)    # returns 0
+winsorize(42,  0, 100)    # returns 42
+```
+
+```python
+# Default arguments
+def greet(name, greeting="Hello"):
+    return f"{greeting}, {name}!"
+
+greet("Valentin")            # "Hello, Valentin!"
+greet("Valentin", "Hi")      # "Hi, Valentin!"
+
+# Return multiple values (returns a tuple)
+def summary(values):
+    return min(values), max(values), sum(values) / len(values)
+
+lo, hi, avg = summary([1, 2, 3, 4, 5])
+```
+
+::: {.box}
+Always write a **docstring** (the `"""..."""` line). It's what `help()` shows. One sentence describing what the function does and what it returns.
+:::
+
+---
+
+## Built-in Functions
+
+```python
+# Sequence operations
+len([1, 2, 3])          # 3
+sum([1, 2, 3])          # 6
+min([3, 1, 2])          # 1
+max([3, 1, 2])          # 3
+sorted([3, 1, 2])       # [1, 2, 3]
+reversed([1, 2, 3])     # iterator → list(reversed(...))
+
+# Range
+list(range(5))          # [0, 1, 2, 3, 4]
+list(range(1, 6))       # [1, 2, 3, 4, 5]
+list(range(0, 10, 2))   # [0, 2, 4, 6, 8]
+
+# Zip — combine two sequences
+firms   = ["Bosch", "Siemens", "ABB"]
+revenue = [91.6, 75.9, 32.2]
+
+for firm, rev in zip(firms, revenue):
+    print(f"{firm}: €{rev}bn")
+
+# Any / all
+any([False, True, False])   # True
+all([True, True, True])     # True
+all([True, False, True])    # False
+```
+
+---
+
+## Math Functions {background-color="#f0f4f9"}
+
+```python
+import math
+
+math.sqrt(16)       # 4.0
+math.log(math.e)    # 1.0  (natural log)
+math.log(100, 10)   # 2.0  (log base 10)
+math.log(2)         # 0.693 (natural log of 2)
+math.exp(1)         # 2.718 (e^1)
+math.ceil(3.2)      # 4
+math.floor(3.9)     # 3
+math.pi             # 3.14159...
+math.inf            # infinity
+```
+
+```python
+# Python operators
+2 ** 3              # 8   (exponentiation)
+10 % 3              # 1   (modulo — remainder)
+10 // 3             # 3   (floor division)
+abs(-5)             # 5   (absolute value)
+round(3.14159, 2)   # 3.14
+```
+
+::: {.box}
+**In research:** `math.log()` is used constantly — log of firm size (`log(total_assets)`) is a standard control variable. `math.sqrt()` appears in standard error calculations. You will mostly use these through **numpy** and **pandas**, but knowing the base Python versions helps you debug.
+:::
+
+---
+
+## Strings & String Methods
+
+::: {.columns}
+::: {.column width="50%"}
+```python
+s = "  SME Internationalization  "
+
+# Common methods
+s.strip()           # remove whitespace
+s.lower()           # "  sme intern..."
+s.upper()           # "  SME INTERN..."
+s.replace("SME", "Firm")
+s.split(" ")        # list of words
+" ".join(["a","b"]) # "a b"
+s.startswith("SME") # False (leading space)
+s.strip().startswith("SME")  # True
+len(s)              # 30
+
+# Check content
+"SME" in s          # True
+s.isdigit()         # False
+"42".isdigit()      # True
+```
+:::
+::: {.column width="48%"}
+```python
+# f-strings (use these — fastest & clearest)
+name  = "Bosch"
+sales = 91.6
+print(f"{name} has €{sales:.1f}bn in sales")
+# Bosch has €91.6bn in sales
+
+# Format numbers
+f"{1234567:.2f}"    # "1234567.00"
+f"{1234567:,.0f}"   # "1,234,567"
+f"{0.0351:.1%}"     # "3.5%"
+
+# Slice a string
+s = "AUT2015"
+s[:3]               # "AUT"  (country)
+s[3:]               # "2015" (year)
+s[3:7]              # "2015"
+```
+
+::: {.box}
+**Useful in data cleaning:** `.strip()` removes invisible whitespace that causes merge failures. Always strip string columns before joining datasets.
+:::
+:::
+:::
+
+---
+
+## Lists
+
+```python
+# Create
+firms = ["Bosch", "Siemens", "ABB", "Voith"]
+
+# Access
+firms[0]            # "Bosch"   (first)
+firms[-1]           # "Voith"   (last)
+firms[1:3]          # ["Siemens", "ABB"]
+
+# Modify
+firms.append("Trumpf")      # add to end
+firms.insert(0, "BMW")      # insert at index
+firms.remove("ABB")         # remove by value
+firms.pop()                 # remove & return last
+firms.sort()                # sort in-place
+firms.reverse()             # reverse in-place
+
+# Check
+"Bosch" in firms            # True
+len(firms)                  # count
+firms.count("Bosch")        # how many times
+firms.index("Siemens")      # position
+```
+
+::: {.box}
+**Lists are mutable** — you can change them after creation. This is unlike tuples (next slide).
+:::
+
+---
+
+## Tuples & Dictionaries
+
+::: {.columns}
+::: {.column width="50%"}
+### Tuples — immutable lists
+```python
+# Parentheses (optional but conventional)
+coords = (48.2, 16.4)       # lat, lon Vienna
+year_range = (2015, 2024)
+
+# Access same as list
+coords[0]           # 48.2
+
+# Cannot modify
+coords[0] = 0       # ← TypeError!
+
+# Unpack
+lat, lon = coords
+
+# Common use: function return values
+def get_range(data):
+    return min(data), max(data)  # returns tuple
+
+lo, hi = get_range([1, 5, 3])
+```
+:::
+::: {.column width="48%"}
+### Dictionaries — key-value pairs
+```python
+firm = {
+    "name":      "Bosch",
+    "country":   "DEU",
+    "employees": 429000,
+    "revenue":   91.6,
+}
+
+# Access
+firm["name"]                # "Bosch"
+firm.get("founded", "N/A")  # safe access
+
+# Modify
+firm["revenue"] = 95.0
+firm["listed"] = False
+
+# Iterate
+for key, value in firm.items():
+    print(f"{key}: {value}")
+
+firm.keys()     # dict_keys([...])
+firm.values()   # dict_values([...])
+"name" in firm  # True
+```
+:::
+:::
+
+::: {.box}
+**In pandas:** a DataFrame is essentially a dict of lists — each column name is a key, each column is a list of values. Understanding dicts makes pandas much more intuitive.
+:::
+
+---
+
+## File Methods {background-color="#f0f4f9"}
+
+```python
+# Write a text file
+with open("output/log.txt", "w") as f:
+    f.write("Run started\n")
+    f.write("Rows pulled: 45,231\n")
+
+# Append to existing file
+with open("output/log.txt", "a") as f:
+    f.write("Run completed\n")
+
+# Read a file
+with open("output/log.txt", "r") as f:
+    content = f.read()          # entire file as string
+    lines   = f.readlines()     # list of lines
+
+# Check if a file or folder exists
+from pathlib import Path
+
+Path("data/raw").exists()           # True / False
+Path("data/raw").mkdir(parents=True, exist_ok=True)  # create folder
+list(Path("data/raw").iterdir())    # list contents
+```
+
+::: {.box}
+**Always use `with open(...)`** — it automatically closes the file even if an error occurs. Using `open()` without `with` risks data corruption if your script crashes mid-write.
+:::
+
+---
+
+## Pathlib — Working with File Paths {background-color="#f0f4f9"}
+
+```python
+from pathlib import Path
+
+# Build paths (works on Windows AND Mac/Linux)
+base    = Path("data")
+raw     = base / "raw"           # data/raw
+out     = Path("output") / "tables" / "summary.csv"
+
+# Never do this — breaks on Windows:
+# raw = "data/raw"  ← fragile string
+
+# Useful methods
+raw.exists()            # does it exist?
+raw.mkdir(parents=True, exist_ok=True)   # create folder
+raw.suffix              # ".csv"
+raw.stem                # "summary" (filename without extension)
+raw.parent              # Path("output/tables")
+list(raw.iterdir())     # list all files
+
+# Find the most recent file in a folder
+files = sorted(Path("data/raw").iterdir())
+latest = files[-1]      # last = most recent (sorted by name)
+```
+
+::: {.box}
+**Key rule:** always use `pathlib.Path` for file paths. It handles `\` vs `/` automatically — your scripts will work identically on Windows and Mac.
+:::
+
+---
+
+## Quick Reference: What to Use When
+
+::: {.small}
+| Task | Use |
+|------|-----|
+| Ordered, changeable collection | `list` |
+| Fixed, unchangeable collection | `tuple` |
+| Key-value mapping | `dict` |
+| Text processing | `str` methods |
+| File paths | `pathlib.Path` |
+| Math beyond `+−×÷` | `math` module |
+| Numbers → formatted text | f-strings |
+| Check type | `type()` |
+| Explore an object | `dir()` |
+| Read documentation | `help()` |
+| Loop with index | `enumerate()` |
+| Loop over two lists | `zip()` |
+:::
+
+::: {.box}
+💡 You do not need to memorise all methods. You need to know **what is possible** and how to find the exact syntax with `help()` and `dir()`. That's what professional Python developers do too.
+:::
+
+---
+
+## Now: Live Code — `01_pull_data.py` {background-color="#002f5f"}
+
+::: {.columns}
+::: {.column width="55%"}
+**What this script does**
+
+1. Loads WRDS credentials from `.env`
+2. Connects to WRDS
+3. Pulls **all** Compustat Global annual variables — fiscal years 2015–2024, all geographies
+4. Chunks the result by fiscal year
+5. Saves each chunk as a `.parquet` file inside a timestamped folder under `data/raw/`
+
+**Why parquet?**
+
+- Columnar format → reads only the columns you need
+- 5–10× smaller than CSV
+- Preserves data types (no silent string conversion)
+- `pandas.read_parquet()` is faster than `read_csv()`
+:::
+::: {.column width="42%"}
+**Folder output:**
+
+```
+data/raw/
+└── 2026-05-13_14-32-05/
+    ├── fyear_2015.parquet
+    ├── fyear_2016.parquet
+    ├── fyear_2017.parquet
+    ├── ...
+    └── fyear_2024.parquet
+```
+
+::: {.box}
+Each run creates a **new timestamped folder** — you always keep a record of every pull. The clean script automatically picks the most recent folder.
+:::
+:::
+:::
+
+---
+
+## Now: Live Code — `02_clean.py` {background-color="#002f5f"}
+
+::: {.columns}
+::: {.column width="55%"}
+**What this script does**
+
+1. Finds the **most recent** timestamped folder in `data/raw/`
+2. Reads all parquet chunks and concatenates into one DataFrame
+3. Standardizes column names (lowercase, no spaces)
+4. Drops full duplicates
+5. Drops observations missing both `gvkey` and `fyear` (panel identifiers)
+6. Converts numeric columns to correct dtype
+7. Sorts by `gvkey`, `fyear`
+8. Saves as `data/processed/panel_clean.parquet`
+
+**Result:** a firm-year panel ready for analysis — one row per firm per year, all Compustat variables as columns.
+:::
+::: {.column width="42%"}
+**Panel structure:**
+
+```
+gvkey  fyear  at    sale   ib   ...
+──────────────────────────────────
+001000  2015  12.3   8.1  0.4
+001000  2016  13.1   8.9  0.5
+001000  2017  14.0   9.2  0.6
+001001  2015   2.1   1.4  0.1
+001001  2016   2.4   1.5  0.2
+...
+```
+
+::: {.box}
+`gvkey` = firm identifier  
+`fyear` = fiscal year  
+Together they form the **unique key** of the panel.
+:::
+:::
+:::
+
+---
+
+## Commit & Push After the Session
+
+```bash
+# Stage both new scripts + any data folder changes
+git add code/01_pull_data.py
+git add code/02_clean.py
+git commit -m "session 5: WRDS pull and panel cleaning scripts"
+git push
+```
+
+::: {.box}
+**Do NOT commit `data/raw/` or `data/processed/`** — these are in `.gitignore` because:
+
+1. Raw data has WRDS licensing restrictions
+2. Parquet files can be gigabytes in size
+3. Anyone with WRDS access can reproduce them by running `task pull`
+:::
+
+**Verify your `.gitignore` has:**
+```gitignore
+data/raw/
+data/processed/
+```
+
+---
+
+## What You Should Have After Today
+
+| Item | Location | Status |
+|------|----------|--------|
+| Python basics practiced | Python shell | ✅ |
+| `01_pull_data.py` | `code/` | ✅ Pushed to GitHub |
+| `02_clean.py` | `code/` | ✅ Pushed to GitHub |
+| Raw data (parquet chunks) | `data/raw/YYYY-MM-DD_HH-MM-SS/` | ✅ Local only |
+| Clean panel | `data/processed/panel_clean.parquet` | ✅ Local only |
+| Commit on GitHub | github.com/[you]/sme-internationalization | ✅ |
+
+---
+
+## Looking Ahead — Sessions 6–8
+
+| Session | Focus |
+|---------|-------|
+| **Session 6** | Exploratory data analysis · Summary stats · Descriptive figures · `03_descriptives.py` |
+| **Session 7** | Panel regression with `linearmodels` · Fixed effects · Testing H1 + H2 · `04_regression.py` |
+| **Session 8** | Quarto `research_note.md` → PDF · BibTeX citations · Peer review · Submission |
+
+::: {.box}
+**Before Session 6:** Make sure `01_pull_data.py` and `02_clean.py` have run successfully on your machine and `data/processed/panel_clean.parquet` exists. If not — run `task all` and check for errors before next week.
+:::
+
+---
+
+## Resources
+
+::: {.columns}
+::: {.column width="50%"}
+**Python references**
+
+- [docs.python.org/3/library](https://docs.python.org/3/library/) — official built-ins
+- [Real Python](https://realpython.com/) — practical tutorials
+- *Python for Data Analysis* (McKinney) — pandas
+- [Pathlib docs](https://docs.python.org/3/library/pathlib.html)
+
+**WRDS**
+
+- [WRDS Python API docs](https://wrds-www.wharton.upenn.edu/pages/support/programming-wrds/programming-python/)
+- [Compustat Global variable list](https://wrds-www.wharton.upenn.edu/data-dictionary/comp_global_daily/)
+:::
+::: {.column width="48%"}
+**Parquet & pandas**
+
+- [pandas parquet docs](https://pandas.pydata.org/docs/reference/api/pandas.read_parquet.html)
+- [PyArrow docs](https://arrow.apache.org/docs/python/)
+
+**Example project**
+
+::: {.blue-box}
+📁 [github.com/vkiefner/sme-intl](https://github.com/vkiefner/sme-intl/){target="_blank"}
+
+`code/01_pull_data.py` and `code/02_clean.py` are the reference implementations for today's session.
+:::
+:::
+:::
