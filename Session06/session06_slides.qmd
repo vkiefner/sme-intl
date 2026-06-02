@@ -1,0 +1,697 @@
+---
+title: "Descriptives, Regression & Panel Data"
+subtitle: "Session 6 — ExInt II: Research Designs in SME Research"
+author: "WU Vienna | SS 2026"
+date: "May 2026"
+format:
+  revealjs:
+    theme: default
+    slide-number: true
+    footer: "ExInt II · WU Vienna · SS 2026"
+    transition: fade
+    highlight-style: github
+    code-line-numbers: true
+    width: 1280
+    height: 720
+    css: |
+      :root { --wu-blue: #002f5f; --wu-red: #c8102e; }
+      .reveal h1, .reveal h2 { color: var(--wu-blue); }
+      .reveal h3 { color: var(--wu-red); font-size: 0.95em; }
+      .box {
+        border-left: 4px solid var(--wu-red);
+        background: #f8f8f8;
+        padding: 0.5em 1em;
+        border-radius: 4px;
+        margin: 0.4em 0;
+        font-size: 0.87em;
+      }
+      .blue-box {
+        border: 2px solid var(--wu-blue);
+        background: #eef3f9;
+        padding: 0.6em 1em;
+        border-radius: 6px;
+        margin: 0.4em 0;
+        font-size: 0.87em;
+      }
+      .small { font-size: 0.80em; }
+      .tiny  { font-size: 0.68em; }
+      table  { font-size: 0.78em; }
+execute:
+  echo: true
+  eval: false
+---
+
+## Today at a Glance {background-color="#002f5f"}
+
+::: {.columns}
+::: {.column width="55%"}
+**What we cover**
+
+1. Pandas essentials for research
+2. Variable construction & winsorizing
+3. Descriptive statistics & what to look for
+4. Regression fundamentals — OLS recap
+5. From OLS to panel data
+6. Six panel regression methods
+7. Limited dependent variable models
+8. Live: `03_descriptives.py`
+9. Live: `04_regression.py`
+
+**Reference:** [github.com/vkiefner/sme-intl](https://github.com/vkiefner/sme-intl/){target="_blank"}
+:::
+::: {.column width="42%"}
+**End-of-session deliverable**
+
+::: {.blue-box}
+✅ Variables constructed in your panel  
+✅ Summary statistics table saved  
+✅ At least one figure saved  
+✅ Regression results saved  
+✅ Both scripts committed to GitHub
+:::
+:::
+:::
+
+---
+
+## Pandas Essentials — Loading & Inspecting {background-color="#f0f4f9"}
+
+```python
+import pandas as pd
+
+# Load your clean panel
+df = pd.read_parquet("data/processed/panel_clean.parquet")
+
+# First look — always do these three
+df.shape          # (rows, columns)
+df.dtypes         # column types
+df.head(5)        # first 5 rows
+
+# Column overview
+df.columns.tolist()          # all column names
+df.describe()                # summary stats for numeric cols
+df.isnull().sum()            # missing values per column
+
+# Select columns
+df[["gvkey", "fyear", "at", "ib"]]     # multiple columns
+df["at"]                                # single column → Series
+
+# Filter rows
+df[df["loc"] == "AUT"]                  # Austrian firms only
+df[df["fyear"] >= 2018]                 # from 2018 onwards
+df[(df["loc"] == "DEU") & (df["at"] > 0)]  # combined filter
+```
+
+---
+
+## Pandas Essentials — Groupby & Merge
+
+```python
+# Group by — descriptive stats per country
+df.groupby("loc")["at"].mean()
+df.groupby(["loc", "fyear"])["ib"].agg(["mean", "std", "count"])
+
+# Create new columns (variable construction)
+df["roa"]          = df["ib"] / df["at"]
+df["rd_intensity"] = df["xrd"].fillna(0) / df["at"]
+df["leverage"]     = (df["dltt"] + df["dlc"]) / df["seq"]
+df["ln_at"]        = df["at"].apply(lambda x: pd.NA if x <= 0 else __import__('math').log(x))
+df["age"]          = df["fyear"] - df["inco"]
+
+# Sort
+df = df.sort_values(["gvkey", "fyear"]).reset_index(drop=True)
+
+# Lag a variable (for growth rates)
+df["sale_lag"] = df.groupby("gvkey")["sale"].shift(1)
+df["sale_growth"] = (df["sale"] - df["sale_lag"]) / df["sale_lag"]
+```
+
+::: {.box}
+**pandas vs Polars:** For large datasets, Polars is faster. But `linearmodels` (our regression package) expects pandas DataFrames — so we stay with pandas for this project.
+:::
+
+---
+
+## Pandas Essentials — Other Useful Operations
+
+```python
+# Drop missing values
+df.dropna(subset=["roa", "rd_intensity"])    # drop if ANY of these are NaN
+df["xrd"].fillna(0)                          # fill NaN with 0
+
+# Check for duplicates
+df.duplicated(subset=["gvkey", "fyear"]).sum()
+
+# Value counts — useful for categorical variables
+df["loc"].value_counts()
+df["curcd"].value_counts()
+
+# Reset index after filtering
+df = df.reset_index(drop=True)
+
+# Save intermediate results
+df.to_parquet("data/processed/panel_with_vars.parquet", index=False)
+df.to_csv("output/tables/panel_preview.csv", index=False)
+
+# Set panel index (required by linearmodels)
+df = df.set_index(["gvkey", "fyear"])
+```
+
+::: {.box}
+💡 `set_index(["gvkey", "fyear"])` is the one pandas operation unique to panel data. `linearmodels` requires this MultiIndex to know which dimension is entity and which is time.
+:::
+
+---
+
+## Variable Construction — Our Project {background-color="#f0f4f9"}
+
+::: {.small}
+| Variable | Compustat fields | Formula | Role |
+|----------|-----------------|---------|------|
+| **RoA** | `ib`, `at` | `ib / at` | Dependent (Y) |
+| **R&D intensity** | `xrd`, `at` | `xrd.fillna(0) / at` | Independent (X) |
+| **Firm size** | `at` | `log(at)` | Control |
+| **Leverage** | `dltt`, `dlc`, `seq` | `(dltt + dlc) / seq` | Control |
+| **Firm age** | `fyear`, `inco` | `fyear - inco` | Control |
+| **CAPX intensity** | `capx`, `at` | `capx / at` | Control |
+:::
+
+::: {.box}
+**Why ratios?** Ratios are currency-neutral — numerator and denominator are in the same currency, so RoA is comparable across EUR firms regardless of size. Absolute levels (`at` in millions EUR) are not directly comparable across firms of different sizes.
+:::
+
+**Students:** replace these with your own variables from your README.md variable table.
+
+---
+
+## Winsorizing — Why & How
+
+::: {.columns}
+::: {.column width="50%"}
+**The problem: extreme outliers**
+
+A single data entry error or genuine outlier (RoA = 500%) can:
+
+- Pull regression coefficients dramatically
+- Inflate standard errors
+- Make results non-representative
+
+**Standard practice:** winsorize at **1%–99%** (sometimes 5%–95% for very noisy variables)
+
+::: {.box}
+Winsorizing ≠ dropping. Values beyond the threshold are **replaced** with the threshold value, not removed. You keep the same number of observations.
+:::
+:::
+::: {.column width="48%"}
+```python
+def winsorize(series, lower=0.01, upper=0.99):
+    """Replace extreme values with percentile bounds."""
+    lo = series.quantile(lower)
+    hi = series.quantile(upper)
+    return series.clip(lo, hi)
+
+# Apply to all continuous research variables
+for col in ["roa", "rd_intensity",
+            "leverage", "capx_intensity"]:
+    df[col] = winsorize(df[col])
+```
+
+**Visualize the effect:**
+```python
+import matplotlib.pyplot as plt
+
+fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+df["roa_raw"].hist(bins=50, ax=axes[0])
+axes[0].set_title("RoA — before winsorizing")
+df["roa"].hist(bins=50, ax=axes[1])
+axes[1].set_title("RoA — after winsorizing")
+```
+:::
+:::
+
+---
+
+## Descriptive Statistics — What to Look For
+
+::: {.columns}
+::: {.column width="50%"}
+**Summary statistics table**
+
+```python
+vars = ["roa", "rd_intensity",
+        "leverage", "ln_at", "age"]
+
+summary = df[vars].describe(
+    percentiles=[0.25, 0.5, 0.75]
+).T.round(3)
+```
+
+**What to check:**
+
+- **Mean vs median:** large gap = skew → log-transform?
+- **Std dev:** larger than mean = high variance → winsorize?
+- **Min/max:** impossible values? (negative assets, RoA < -1)
+- **Count:** fewer than total rows = missing values
+
+::: {.box}
+If `count` for your X variable is much less than total rows, you have a missing data problem. Check `df["xrd"].isna().sum()`.
+:::
+:::
+::: {.column width="48%"}
+**Correlation matrix**
+
+```python
+import seaborn as sns
+import numpy as np
+
+corr = df[vars].corr().round(2)
+mask = np.triu(np.ones_like(corr, dtype=bool))
+sns.heatmap(corr, mask=mask, annot=True,
+            cmap="RdYlBu_r", center=0)
+```
+
+**What to check:**
+
+- **X vs Y:** is there a raw correlation with your DV?
+- **X vs controls:** multicollinearity if r > 0.8
+- **Between controls:** if two controls correlate > 0.8, consider dropping one
+
+**Rule of thumb:** r > 0.8 between two independent variables → multicollinearity risk → check Variance Inflation Factor (VIF)
+:::
+:::
+
+---
+
+## Visualizing the Main Relationship
+
+```python
+import matplotlib.pyplot as plt
+
+fig, axes = plt.subplots(1, 2, figsize=(13, 5))
+
+# Left: raw scatter + bin means (shows the pattern without assuming linearity)
+axes[0].scatter(df["rd_intensity"], df["roa"],
+                alpha=0.05, s=5, color="#002f5f")
+bins = pd.cut(df["rd_intensity"], bins=20)
+bm   = df.groupby(bins, observed=True)[["rd_intensity", "roa"]].mean()
+axes[0].plot(bm["rd_intensity"], bm["roa"],
+             color="#c8102e", lw=2.5, label="Bin mean")
+axes[0].set_xlabel("R&D Intensity"); axes[0].set_ylabel("RoA")
+axes[0].set_title("R&D Intensity vs. RoA")
+axes[0].legend()
+
+# Right: distribution of DV
+axes[1].hist(df["roa"], bins=60, color="#002f5f", alpha=0.7)
+axes[1].axvline(df["roa"].mean(), color="#c8102e", lw=2, label="Mean")
+axes[1].set_xlabel("RoA"); axes[1].set_title("Distribution of RoA")
+axes[1].legend()
+
+fig.savefig("output/figures/main_relationship.png", dpi=150, bbox_inches="tight")
+```
+
+::: {.box}
+**Why bin means?** A raw scatter with 50,000 points is unreadable. Bin means show the average Y at each level of X — revealing the shape of the relationship without imposing a functional form.
+:::
+
+---
+
+## Regression Fundamentals — OLS Recap {background-color="#002f5f"}
+
+**The OLS model:**
+
+$$Y_i = \alpha + \beta_1 X_{1i} + \beta_2 X_{2i} + \cdots + \beta_k X_{ki} + \varepsilon_i$$
+
+- $Y_i$ — dependent variable (e.g. RoA)
+- $X_{ki}$ — independent variables (R&D intensity, controls)
+- $\beta_k$ — coefficients: effect of a 1-unit change in $X_k$ on $Y$, holding all other variables constant (**ceteris paribus**)
+- $\varepsilon_i$ — error term (everything not captured by the model)
+
+**OLS minimizes the sum of squared residuals:**
+
+$$\hat{\beta} = \arg\min_\beta \sum_{i=1}^n (Y_i - \hat{Y}_i)^2$$
+
+**Key OLS assumptions (Gauss-Markov):**
+
+1. Linearity in parameters
+2. Random sampling
+3. No perfect multicollinearity
+4. Zero conditional mean of errors: $E[\varepsilon | X] = 0$
+5. Homoskedasticity: $Var(\varepsilon | X) = \sigma^2$
+
+---
+
+## Reading OLS Output {background-color="#f0f4f9"}
+
+```python
+import statsmodels.formula.api as smf
+
+model = smf.ols("roa ~ rd_intensity + ln_at + leverage + age", data=df)
+result = model.fit()
+print(result.summary())
+```
+
+**What to read:**
+
+::: {.small}
+| Output element | What it means |
+|----------------|---------------|
+| **coef** | Estimated β — direction and magnitude of effect |
+| **std err** | Uncertainty around the estimate |
+| **t** | coef / std err — how many standard errors from zero |
+| **P>\|t\|** | p-value: probability of seeing this result if β = 0 |
+| **[0.025, 0.975]** | 95% confidence interval — should not include 0 |
+| **R²** | Share of variance in Y explained by the model |
+| **F-statistic** | Joint significance of all variables |
+:::
+
+::: {.box}
+**Stars:** *** p<0.01 &nbsp;&nbsp; ** p<0.05 &nbsp;&nbsp; * p<0.10 &nbsp;&nbsp; Conventional thresholds — arbitrary but universal.
+:::
+
+---
+
+## The Problem with OLS for Panel Data
+
+::: {.columns}
+::: {.column width="50%"}
+**OLS assumes observations are independent.** In panel data they are not:
+
+- Firm A in 2018 and 2019 are correlated (same firm)
+- Firm A and Firm B may differ systematically in ways we don't observe (management quality, culture, location advantages)
+
+**Omitted variable bias:**
+
+$$\text{True model: } Y_{it} = \alpha + \beta X_{it} + \gamma Z_i + \varepsilon_{it}$$
+
+If $Z_i$ (unobserved, time-invariant) correlates with $X_{it}$, OLS estimate of $\beta$ is **biased**.
+
+**Example:** innovative firms (high R&D) may also have better management — we can't measure management, but it affects RoA.
+:::
+::: {.column width="48%"}
+
+**Visualizing the problem:**
+
+```
+         Firm A (high mgmt quality)
+RoA ↑     ●  ●  ●
+          ●  ●
+         Firm B (low mgmt quality)
+          ●  ●
+          ●  ●  ●
+
+         ───────────────→ R&D intensity
+```
+
+OLS sees a positive slope across all dots.  
+But **within** each firm the slope may be flat or negative.
+
+**Fixed effects solution:** control for all time-invariant firm characteristics by including a dummy for each firm ($\mu_i$).
+
+$$Y_{it} = \beta X_{it} + \gamma Z_{it} + \mu_i + \lambda_t + \varepsilon_{it}$$
+:::
+:::
+
+---
+
+## The Firm-Year Panel Structure
+
+$$Y_{it} = \beta X_{it} + \gamma Z_{it} + \mu_i + \lambda_t + \varepsilon_{it}$$
+
+::: {.columns}
+::: {.column width="50%"}
+**Two dimensions:**
+
+- $i$ = firm (entity dimension)
+- $t$ = fiscal year (time dimension)
+
+**Two types of fixed effects:**
+
+- $\mu_i$ = **firm fixed effects** — absorb all time-invariant firm characteristics (country, industry, founder quality, culture)
+- $\lambda_t$ = **year fixed effects** — absorb common shocks affecting all firms in a given year (financial crisis, COVID, policy changes)
+
+**Together:** two-way fixed effects (TWFE) — the standard in empirical IB research
+:::
+::: {.column width="48%"}
+```python
+from linearmodels.panel import PanelOLS
+
+# Requires MultiIndex: (entity, time)
+df_panel = df.set_index(["gvkey", "fyear"])
+
+model = PanelOLS.from_formula(
+    "roa ~ rd_intensity + ln_at + "
+    "leverage + age + "
+    "EntityEffects + TimeEffects",
+    data=df_panel
+)
+
+result = model.fit(
+    cov_type="clustered",
+    cluster_entity=True    # cluster SEs at firm level
+)
+print(result.summary)
+```
+
+::: {.box}
+**Clustered standard errors:** firms have correlated errors over time. Clustering at the firm level corrects for this — otherwise SEs are too small and t-stats too large.
+:::
+:::
+:::
+
+---
+
+## Six Panel Regression Methods {background-color="#f0f4f9"}
+
+::: {.small}
+| Method | When to use | Key assumption | In Python |
+|--------|------------|----------------|-----------|
+| **Pooled OLS** | Baseline only — ignores panel structure | Obs. independent | `smf.ols()` |
+| **Random Effects (RE)** | Unobserved heterogeneity uncorrelated with X | Strict exogeneity | `RandomEffects` |
+| **Fixed Effects (FE)** | Unobserved heterogeneity may correlate with X | Within-firm variation in X | `PanelOLS + EntityEffects` |
+| **Two-way FE (TWFE)** | FE + common time shocks | — | `+ TimeEffects` |
+| **First Differences (FD)** | Non-stationary panels, unit roots | Errors not serially correlated | `FirstDifferenceOLS` |
+| **Between Effects (BE)** | Cross-sectional variation only | Obs. independent across firms | `BetweenOLS` |
+:::
+
+**How to choose:**
+
+1. **Always start with TWFE** — it is the most conservative and credible
+2. **Hausman test:** if RE is consistent, use RE (more efficient); if not, use FE
+3. **FD** if you suspect non-stationarity (trending variables like assets)
+4. **BE** only if you have a specific cross-sectional research question
+
+::: {.box}
+For this course: **TWFE with clustered SEs** is the standard. Always report it. Add RE as a robustness check.
+:::
+
+---
+
+## Hausman Test — FE or RE?
+
+```python
+from linearmodels.panel import RandomEffects, PanelOLS
+from linearmodels.panel.model import compare
+
+# Run both
+fe = PanelOLS.from_formula(
+    "roa ~ rd_intensity + ln_at + leverage + EntityEffects",
+    data=df_panel).fit()
+
+re = RandomEffects.from_formula(
+    "roa ~ rd_intensity + ln_at + leverage",
+    data=df_panel).fit()
+```
+
+**Logic of the Hausman test:**
+
+- **H₀:** RE is consistent (unobserved effects uncorrelated with X) → prefer RE (more efficient)
+- **H₁:** RE is inconsistent (correlation exists) → use FE
+
+$$H = (\hat{\beta}_{FE} - \hat{\beta}_{RE})' [\text{Var}(\hat{\beta}_{FE}) - \text{Var}(\hat{\beta}_{RE})]^{-1} (\hat{\beta}_{FE} - \hat{\beta}_{RE}) \sim \chi^2_k$$
+
+::: {.box}
+**In practice for IB research:** most scholars default to FE because the assumption that firm-level unobservables are uncorrelated with R&D or internationalization is hard to defend theoretically. Use the Hausman test as confirmation, not as the primary decision criterion.
+:::
+
+---
+
+## Limited Dependent Variable Models
+
+**When your Y is not continuous:**
+
+::: {.small}
+| DV type | Example | Model | Command |
+|---------|---------|-------|---------|
+| **Binary (0/1)** | Firm entered foreign market: yes/no | Logit / Probit | `smf.logit()` / `smf.probit()` |
+| **Count (0,1,2,...)** | Number of export markets | Poisson / Neg. Binomial | `smf.poisson()` |
+| **Censored** | Export share (many zeros) | Tobit | `statsmodels.tobit` |
+| **Ordered** | Survey: agree/neutral/disagree | Ordered logit | `statsmodels.MNLogit` |
+:::
+
+**Logit interpretation:**
+
+$$\ln\left(\frac{p}{1-p}\right) = \alpha + \beta X$$
+
+Coefficients are **log-odds** — not directly interpretable. Convert to **odds ratios**: $e^\beta$
+
+::: {.box}
+For most SME performance research (RoA, RoE, sales growth) — continuous DV — you will use linear panel FE. Logit/Probit are relevant if your DV is "did the firm internationalize?" (binary) or "how many markets did it enter?" (count).
+:::
+
+---
+
+## Deciding Which Model to Use
+
+```
+Is your DV continuous?
+├── YES → Does your data have a panel structure (firm × year)?
+│         ├── YES → Use TWFE (PanelOLS + EntityEffects + TimeEffects)
+│         │         └── Run Hausman test to confirm FE > RE
+│         └── NO  → Use OLS (smf.ols)
+│
+└── NO  → What type?
+          ├── Binary (0/1)    → Logit or Probit
+          ├── Count (0,1,2..) → Poisson or Negative Binomial
+          ├── Censored (many zeros) → Tobit
+          └── Ordered categories → Ordered Logit
+```
+
+::: {.box}
+**For this course:** your DV (RoA, leverage ratio, sales growth) is continuous and your data is a firm-year panel → **always use TWFE** as your main specification.
+:::
+
+---
+
+## Now: Live Code — `03_descriptives.py` {background-color="#002f5f"}
+
+::: {.columns}
+::: {.column width="55%"}
+**What the script does**
+
+1. Loads `panel_clean.parquet`
+2. Constructs research variables (RoA, R&D intensity, leverage, etc.)
+3. Applies SME filter (emp < 0.25 OR at ≤ 43)
+4. Winsorizes at 1%–99%
+5. Saves summary statistics → `output/tables/`
+6. Saves correlation matrix → `output/figures/`
+7. Saves main relationship plot → `output/figures/`
+8. Saves `data/processed/panel_with_vars.parquet` for regression
+
+**You need to adapt:**
+
+- Variable construction to match your own Y and X
+- The SME filter to match your sample definition
+:::
+::: {.column width="42%"}
+**Output files:**
+
+```
+output/
+├── tables/
+│   └── summary_statistics.csv
+└── figures/
+    ├── correlation_matrix.png
+    ├── dv_distribution.png
+    └── main_relationship.png
+
+data/processed/
+└── panel_with_vars.parquet
+```
+:::
+:::
+
+---
+
+## Now: Live Code — `04_regression.py` {background-color="#002f5f"}
+
+::: {.columns}
+::: {.column width="55%"}
+**What the script does**
+
+1. Loads `panel_with_vars.parquet`
+2. Sets panel index (`gvkey`, `fyear`)
+3. **Model 1:** Pooled OLS baseline
+4. **Model 2:** TWFE — main specification
+5. **Model 3:** TWFE + interaction term (H2)
+6. Prints formatted results table
+7. Saves results → `output/tables/regression_results.csv`
+
+**You need to adapt:**
+
+- Formula strings to use your own variable names
+- Interaction term to match your H2
+
+**Reading the output:**
+
+- β(X) significant and positive → X increases Y
+- β(X²) negative → inverted U-shape (H1)
+- β(X × moderator) positive → positive moderation (H2)
+:::
+::: {.column width="42%"}
+**Regression table structure:**
+
+```
+                    (1)      (2)      (3)
+                   OLS      FE      FE+Int
+────────────────────────────────────────
+rd_intensity     0.045** 0.038**  0.041**
+                (0.018)  (0.015)  (0.016)
+
+ln_at           -0.012  -0.008   -0.009
+                (0.009)  (0.007)  (0.007)
+
+leverage        -0.031** -0.025* -0.026*
+                (0.012)  (0.013)  (0.013)
+
+Firm FE           No      Yes      Yes
+Year FE           No      Yes      Yes
+Clustered SE      No      Yes      Yes
+N              12,451   12,451   12,451
+R²              0.042    0.318    0.321
+────────────────────────────────────────
+* p<0.10  ** p<0.05  *** p<0.01
+```
+:::
+:::
+
+---
+
+## After Today — What to Adapt in Your Own Scripts
+
+::: {.small}
+| Step | In `03_descriptives.py` | In `04_regression.py` |
+|------|------------------------|----------------------|
+| **Variables** | Change formula for Y and X | Change formula string |
+| **Sample** | Adjust SME filter for your sample | — |
+| **Winsorize** | Add/remove variables from the list | — |
+| **Plots** | Change axis labels to your variable names | — |
+| **H1 test** | — | Add X² term if testing non-linearity |
+| **H2 test** | — | Change interaction term to your moderator |
+:::
+
+::: {.box}
+**Commit after adapting:**
+```bash
+git add code/03_descriptives.py code/04_regression.py
+git commit -m "session 6: descriptives and regression for [your topic]"
+git push
+```
+:::
+
+---
+
+## Looking Ahead — Session 7 (Final)
+
+| Task | What |
+|------|------|
+| **Research note** | Write up results in `research_note.md` using Quarto |
+| **Insert tables** | Reference `output/tables/` in your note |
+| **Insert figures** | Reference `output/figures/` in your note |
+| **BibTeX** | Cite using `[@AuthorYear]` from `library.bib` |
+| **Render** | `quarto render research_note.md` → PDF |
+| **Peer review** | Clone a classmate's repo, run `task all`, check reproducibility |
+| **Submission** | Push final version, share GitHub link |
+
+::: {.blue-box}
+**Before Session 7:** make sure `task all` runs end-to-end on your machine and produces results in `output/`. Your research note should already have your RQ, hypotheses, and variable table from earlier sessions.
+:::

@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="session06_slides_files/libs/clipboard/clipboard.min.js"></script>
+<script src="session06_slides_files/libs/quarto-html/tabby.min.js"></script>
+<script src="session06_slides_files/libs/quarto-html/popper.min.js"></script>
+<script src="session06_slides_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="session06_slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="session06_slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="session06_slides_files/libs/quarto-html/quarto-syntax-highlighting-0626ff4d7a71b55c8707dcae1d04a9b6.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.6.39">
+
+  <meta name="author" content="WU Vienna | SS 2026">
+  <meta name="dcterms.date" content="2026-05-01">
+  <title>Descriptives, Regression &amp; Panel Data</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="session06_slides_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="session06_slides_files/libs/revealjs/dist/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+      }
+    pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+    div.sourceCode
+      { color: #24292e;  }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #24292e; } /* Normal */
+    code span.al { color: #ff5555; font-weight: bold; } /* Alert */
+    code span.an { color: #6a737d; } /* Annotation */
+    code span.at { color: #d73a49; } /* Attribute */
+    code span.bn { color: #005cc5; } /* BaseN */
+    code span.bu { color: #d73a49; } /* BuiltIn */
+    code span.cf { color: #d73a49; } /* ControlFlow */
+    code span.ch { color: #032f62; } /* Char */
+    code span.cn { color: #005cc5; } /* Constant */
+    code span.co { color: #6a737d; } /* Comment */
+    code span.cv { color: #6a737d; } /* CommentVar */
+    code span.do { color: #6a737d; } /* Documentation */
+    code span.dt { color: #d73a49; } /* DataType */
+    code span.dv { color: #005cc5; } /* DecVal */
+    code span.er { color: #ff5555; text-decoration: underline; } /* Error */
+    code span.ex { color: #d73a49; font-weight: bold; } /* Extension */
+    code span.fl { color: #005cc5; } /* Float */
+    code span.fu { color: #6f42c1; } /* Function */
+    code span.im { color: #032f62; } /* Import */
+    code span.in { color: #6a737d; } /* Information */
+    code span.kw { color: #d73a49; } /* Keyword */
+    code span.op { color: #24292e; } /* Operator */
+    code span.ot { color: #6f42c1; } /* Other */
+    code span.pp { color: #d73a49; } /* Preprocessor */
+    code span.re { color: #6a737d; } /* RegionMarker */
+    code span.sc { color: #005cc5; } /* SpecialChar */
+    code span.ss { color: #032f62; } /* SpecialString */
+    code span.st { color: #032f62; } /* String */
+    code span.va { color: #e36209; } /* Variable */
+    code span.vs { color: #032f62; } /* VerbatimString */
+    code span.wa { color: #ff5555; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="session06_slides_files/libs/revealjs/dist/theme/quarto-bbe7401fe57d4b791b917637bb662036.css">
+  <link rel="stylesheet" href=":root { --wu-blue: #002f5f; --wu-red: #c8102e; }
+.reveal h1, .reveal h2 { color: var(--wu-blue); }
+.reveal h3 { color: var(--wu-red); font-size: 0.95em; }
+.box {
+  border-left: 4px solid var(--wu-red);
+  background: #f8f8f8;
+  padding: 0.5em 1em;
+  border-radius: 4px;
+  margin: 0.4em 0;
+  font-size: 0.87em;
+}
+.blue-box {
+  border: 2px solid var(--wu-blue);
+  background: #eef3f9;
+  padding: 0.6em 1em;
+  border-radius: 6px;
+  margin: 0.4em 0;
+  font-size: 0.87em;
+}
+.small { font-size: 0.80em; }
+.tiny  { font-size: 0.68em; }
+table  { font-size: 0.78em; }">
+  <link href="session06_slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="session06_slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="session06_slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="session06_slides_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <h1 class="title">Descriptives, Regression &amp; Panel Data</h1>
+  <p class="subtitle">Session 6 — ExInt II: Research Designs in SME Research</p>
+
+<div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+WU Vienna | SS 2026 
+</div>
+</div>
+</div>
+
+  <p class="date">2026-05-01</p>
+</section>
+<section id="today-at-a-glance" class="slide level2" data-background-color="#002f5f">
+<h2>Today at a Glance</h2>
+<div class="columns">
+<div class="column" style="width:55%;">
+<p><strong>What we cover</strong></p>
+<ol type="1">
+<li>Pandas essentials for research</li>
+<li>Variable construction &amp; winsorizing</li>
+<li>Descriptive statistics &amp; what to look for</li>
+<li>Regression fundamentals — OLS recap</li>
+<li>From OLS to panel data</li>
+<li>Six panel regression methods</li>
+<li>Limited dependent variable models</li>
+<li>Live: <code>03_descriptives.py</code></li>
+<li>Live: <code>04_regression.py</code></li>
+</ol>
+<p><strong>Reference:</strong> <a href="https://github.com/vkiefner/sme-intl/" target="_blank">github.com/vkiefner/sme-intl</a></p>
+</div><div class="column" style="width:42%;">
+<p><strong>End-of-session deliverable</strong></p>
+<div class="blue-box">
+<p>✅ Variables constructed in your panel<br>
+✅ Summary statistics table saved<br>
+✅ At least one figure saved<br>
+✅ Regression results saved<br>
+✅ Both scripts committed to GitHub</p>
+</div>
+</div></div>
+</section>
+<section id="pandas-essentials-loading-inspecting" class="slide level2" data-background-color="#f0f4f9">
+<h2>Pandas Essentials — Loading &amp; Inspecting</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href=""></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-2"><a href=""></a></span>
+<span id="cb1-3"><a href=""></a><span class="co"># Load your clean panel</span></span>
+<span id="cb1-4"><a href=""></a>df <span class="op">=</span> pd.read_parquet(<span class="st">"data/processed/panel_clean.parquet"</span>)</span>
+<span id="cb1-5"><a href=""></a></span>
+<span id="cb1-6"><a href=""></a><span class="co"># First look — always do these three</span></span>
+<span id="cb1-7"><a href=""></a>df.shape          <span class="co"># (rows, columns)</span></span>
+<span id="cb1-8"><a href=""></a>df.dtypes         <span class="co"># column types</span></span>
+<span id="cb1-9"><a href=""></a>df.head(<span class="dv">5</span>)        <span class="co"># first 5 rows</span></span>
+<span id="cb1-10"><a href=""></a></span>
+<span id="cb1-11"><a href=""></a><span class="co"># Column overview</span></span>
+<span id="cb1-12"><a href=""></a>df.columns.tolist()          <span class="co"># all column names</span></span>
+<span id="cb1-13"><a href=""></a>df.describe()                <span class="co"># summary stats for numeric cols</span></span>
+<span id="cb1-14"><a href=""></a>df.isnull().<span class="bu">sum</span>()            <span class="co"># missing values per column</span></span>
+<span id="cb1-15"><a href=""></a></span>
+<span id="cb1-16"><a href=""></a><span class="co"># Select columns</span></span>
+<span id="cb1-17"><a href=""></a>df[[<span class="st">"gvkey"</span>, <span class="st">"fyear"</span>, <span class="st">"at"</span>, <span class="st">"ib"</span>]]     <span class="co"># multiple columns</span></span>
+<span id="cb1-18"><a href=""></a>df[<span class="st">"at"</span>]                                <span class="co"># single column → Series</span></span>
+<span id="cb1-19"><a href=""></a></span>
+<span id="cb1-20"><a href=""></a><span class="co"># Filter rows</span></span>
+<span id="cb1-21"><a href=""></a>df[df[<span class="st">"loc"</span>] <span class="op">==</span> <span class="st">"AUT"</span>]                  <span class="co"># Austrian firms only</span></span>
+<span id="cb1-22"><a href=""></a>df[df[<span class="st">"fyear"</span>] <span class="op">&gt;=</span> <span class="dv">2018</span>]                 <span class="co"># from 2018 onwards</span></span>
+<span id="cb1-23"><a href=""></a>df[(df[<span class="st">"loc"</span>] <span class="op">==</span> <span class="st">"DEU"</span>) <span class="op">&amp;</span> (df[<span class="st">"at"</span>] <span class="op">&gt;</span> <span class="dv">0</span>)]  <span class="co"># combined filter</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="pandas-essentials-groupby-merge" class="slide level2">
+<h2>Pandas Essentials — Groupby &amp; Merge</h2>
+<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href=""></a><span class="co"># Group by — descriptive stats per country</span></span>
+<span id="cb2-2"><a href=""></a>df.groupby(<span class="st">"loc"</span>)[<span class="st">"at"</span>].mean()</span>
+<span id="cb2-3"><a href=""></a>df.groupby([<span class="st">"loc"</span>, <span class="st">"fyear"</span>])[<span class="st">"ib"</span>].agg([<span class="st">"mean"</span>, <span class="st">"std"</span>, <span class="st">"count"</span>])</span>
+<span id="cb2-4"><a href=""></a></span>
+<span id="cb2-5"><a href=""></a><span class="co"># Create new columns (variable construction)</span></span>
+<span id="cb2-6"><a href=""></a>df[<span class="st">"roa"</span>]          <span class="op">=</span> df[<span class="st">"ib"</span>] <span class="op">/</span> df[<span class="st">"at"</span>]</span>
+<span id="cb2-7"><a href=""></a>df[<span class="st">"rd_intensity"</span>] <span class="op">=</span> df[<span class="st">"xrd"</span>].fillna(<span class="dv">0</span>) <span class="op">/</span> df[<span class="st">"at"</span>]</span>
+<span id="cb2-8"><a href=""></a>df[<span class="st">"leverage"</span>]     <span class="op">=</span> (df[<span class="st">"dltt"</span>] <span class="op">+</span> df[<span class="st">"dlc"</span>]) <span class="op">/</span> df[<span class="st">"seq"</span>]</span>
+<span id="cb2-9"><a href=""></a>df[<span class="st">"ln_at"</span>]        <span class="op">=</span> df[<span class="st">"at"</span>].<span class="bu">apply</span>(<span class="kw">lambda</span> x: pd.NA <span class="cf">if</span> x <span class="op">&lt;=</span> <span class="dv">0</span> <span class="cf">else</span> <span class="bu">__import__</span>(<span class="st">'math'</span>).log(x))</span>
+<span id="cb2-10"><a href=""></a>df[<span class="st">"age"</span>]          <span class="op">=</span> df[<span class="st">"fyear"</span>] <span class="op">-</span> df[<span class="st">"inco"</span>]</span>
+<span id="cb2-11"><a href=""></a></span>
+<span id="cb2-12"><a href=""></a><span class="co"># Sort</span></span>
+<span id="cb2-13"><a href=""></a>df <span class="op">=</span> df.sort_values([<span class="st">"gvkey"</span>, <span class="st">"fyear"</span>]).reset_index(drop<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-14"><a href=""></a></span>
+<span id="cb2-15"><a href=""></a><span class="co"># Lag a variable (for growth rates)</span></span>
+<span id="cb2-16"><a href=""></a>df[<span class="st">"sale_lag"</span>] <span class="op">=</span> df.groupby(<span class="st">"gvkey"</span>)[<span class="st">"sale"</span>].shift(<span class="dv">1</span>)</span>
+<span id="cb2-17"><a href=""></a>df[<span class="st">"sale_growth"</span>] <span class="op">=</span> (df[<span class="st">"sale"</span>] <span class="op">-</span> df[<span class="st">"sale_lag"</span>]) <span class="op">/</span> df[<span class="st">"sale_lag"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="box">
+<p><strong>pandas vs Polars:</strong> For large datasets, Polars is faster. But <code>linearmodels</code> (our regression package) expects pandas DataFrames — so we stay with pandas for this project.</p>
+</div>
+</section>
+<section id="pandas-essentials-other-useful-operations" class="slide level2">
+<h2>Pandas Essentials — Other Useful Operations</h2>
+<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href=""></a><span class="co"># Drop missing values</span></span>
+<span id="cb3-2"><a href=""></a>df.dropna(subset<span class="op">=</span>[<span class="st">"roa"</span>, <span class="st">"rd_intensity"</span>])    <span class="co"># drop if ANY of these are NaN</span></span>
+<span id="cb3-3"><a href=""></a>df[<span class="st">"xrd"</span>].fillna(<span class="dv">0</span>)                          <span class="co"># fill NaN with 0</span></span>
+<span id="cb3-4"><a href=""></a></span>
+<span id="cb3-5"><a href=""></a><span class="co"># Check for duplicates</span></span>
+<span id="cb3-6"><a href=""></a>df.duplicated(subset<span class="op">=</span>[<span class="st">"gvkey"</span>, <span class="st">"fyear"</span>]).<span class="bu">sum</span>()</span>
+<span id="cb3-7"><a href=""></a></span>
+<span id="cb3-8"><a href=""></a><span class="co"># Value counts — useful for categorical variables</span></span>
+<span id="cb3-9"><a href=""></a>df[<span class="st">"loc"</span>].value_counts()</span>
+<span id="cb3-10"><a href=""></a>df[<span class="st">"curcd"</span>].value_counts()</span>
+<span id="cb3-11"><a href=""></a></span>
+<span id="cb3-12"><a href=""></a><span class="co"># Reset index after filtering</span></span>
+<span id="cb3-13"><a href=""></a>df <span class="op">=</span> df.reset_index(drop<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb3-14"><a href=""></a></span>
+<span id="cb3-15"><a href=""></a><span class="co"># Save intermediate results</span></span>
+<span id="cb3-16"><a href=""></a>df.to_parquet(<span class="st">"data/processed/panel_with_vars.parquet"</span>, index<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb3-17"><a href=""></a>df.to_csv(<span class="st">"output/tables/panel_preview.csv"</span>, index<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb3-18"><a href=""></a></span>
+<span id="cb3-19"><a href=""></a><span class="co"># Set panel index (required by linearmodels)</span></span>
+<span id="cb3-20"><a href=""></a>df <span class="op">=</span> df.set_index([<span class="st">"gvkey"</span>, <span class="st">"fyear"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="box">
+<p>💡 <code>set_index(["gvkey", "fyear"])</code> is the one pandas operation unique to panel data. <code>linearmodels</code> requires this MultiIndex to know which dimension is entity and which is time.</p>
+</div>
+</section>
+<section id="variable-construction-our-project" class="slide level2" data-background-color="#f0f4f9">
+<h2>Variable Construction — Our Project</h2>
+<div class="small">
+<table class="caption-top">
+<colgroup>
+<col style="width: 23%">
+<col style="width: 40%">
+<col style="width: 21%">
+<col style="width: 14%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th>Compustat fields</th>
+<th>Formula</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>RoA</strong></td>
+<td><code>ib</code>, <code>at</code></td>
+<td><code>ib / at</code></td>
+<td>Dependent (Y)</td>
+</tr>
+<tr class="even">
+<td><strong>R&amp;D intensity</strong></td>
+<td><code>xrd</code>, <code>at</code></td>
+<td><code>xrd.fillna(0) / at</code></td>
+<td>Independent (X)</td>
+</tr>
+<tr class="odd">
+<td><strong>Firm size</strong></td>
+<td><code>at</code></td>
+<td><code>log(at)</code></td>
+<td>Control</td>
+</tr>
+<tr class="even">
+<td><strong>Leverage</strong></td>
+<td><code>dltt</code>, <code>dlc</code>, <code>seq</code></td>
+<td><code>(dltt + dlc) / seq</code></td>
+<td>Control</td>
+</tr>
+<tr class="odd">
+<td><strong>Firm age</strong></td>
+<td><code>fyear</code>, <code>inco</code></td>
+<td><code>fyear - inco</code></td>
+<td>Control</td>
+</tr>
+<tr class="even">
+<td><strong>CAPX intensity</strong></td>
+<td><code>capx</code>, <code>at</code></td>
+<td><code>capx / at</code></td>
+<td>Control</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="box">
+<p><strong>Why ratios?</strong> Ratios are currency-neutral — numerator and denominator are in the same currency, so RoA is comparable across EUR firms regardless of size. Absolute levels (<code>at</code> in millions EUR) are not directly comparable across firms of different sizes.</p>
+</div>
+<p><strong>Students:</strong> replace these with your own variables from your README.md variable table.</p>
+</section>
+<section id="winsorizing-why-how" class="slide level2">
+<h2>Winsorizing — Why &amp; How</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><strong>The problem: extreme outliers</strong></p>
+<p>A single data entry error or genuine outlier (RoA = 500%) can:</p>
+<ul>
+<li>Pull regression coefficients dramatically</li>
+<li>Inflate standard errors</li>
+<li>Make results non-representative</li>
+</ul>
+<p><strong>Standard practice:</strong> winsorize at <strong>1%–99%</strong> (sometimes 5%–95% for very noisy variables)</p>
+<div class="box">
+<p>Winsorizing ≠ dropping. Values beyond the threshold are <strong>replaced</strong> with the threshold value, not removed. You keep the same number of observations.</p>
+</div>
+</div><div class="column" style="width:48%;">
+<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href=""></a><span class="kw">def</span> winsorize(series, lower<span class="op">=</span><span class="fl">0.01</span>, upper<span class="op">=</span><span class="fl">0.99</span>):</span>
+<span id="cb4-2"><a href=""></a>    <span class="co">"""Replace extreme values with percentile bounds."""</span></span>
+<span id="cb4-3"><a href=""></a>    lo <span class="op">=</span> series.quantile(lower)</span>
+<span id="cb4-4"><a href=""></a>    hi <span class="op">=</span> series.quantile(upper)</span>
+<span id="cb4-5"><a href=""></a>    <span class="cf">return</span> series.clip(lo, hi)</span>
+<span id="cb4-6"><a href=""></a></span>
+<span id="cb4-7"><a href=""></a><span class="co"># Apply to all continuous research variables</span></span>
+<span id="cb4-8"><a href=""></a><span class="cf">for</span> col <span class="kw">in</span> [<span class="st">"roa"</span>, <span class="st">"rd_intensity"</span>,</span>
+<span id="cb4-9"><a href=""></a>            <span class="st">"leverage"</span>, <span class="st">"capx_intensity"</span>]:</span>
+<span id="cb4-10"><a href=""></a>    df[col] <span class="op">=</span> winsorize(df[col])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Visualize the effect:</strong></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href=""></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb5-2"><a href=""></a></span>
+<span id="cb5-3"><a href=""></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">4</span>))</span>
+<span id="cb5-4"><a href=""></a>df[<span class="st">"roa_raw"</span>].hist(bins<span class="op">=</span><span class="dv">50</span>, ax<span class="op">=</span>axes[<span class="dv">0</span>])</span>
+<span id="cb5-5"><a href=""></a>axes[<span class="dv">0</span>].set_title(<span class="st">"RoA — before winsorizing"</span>)</span>
+<span id="cb5-6"><a href=""></a>df[<span class="st">"roa"</span>].hist(bins<span class="op">=</span><span class="dv">50</span>, ax<span class="op">=</span>axes[<span class="dv">1</span>])</span>
+<span id="cb5-7"><a href=""></a>axes[<span class="dv">1</span>].set_title(<span class="st">"RoA — after winsorizing"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div></div>
+</section>
+<section id="descriptive-statistics-what-to-look-for" class="slide level2">
+<h2>Descriptive Statistics — What to Look For</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><strong>Summary statistics table</strong></p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href=""></a><span class="bu">vars</span> <span class="op">=</span> [<span class="st">"roa"</span>, <span class="st">"rd_intensity"</span>,</span>
+<span id="cb6-2"><a href=""></a>        <span class="st">"leverage"</span>, <span class="st">"ln_at"</span>, <span class="st">"age"</span>]</span>
+<span id="cb6-3"><a href=""></a></span>
+<span id="cb6-4"><a href=""></a>summary <span class="op">=</span> df[<span class="bu">vars</span>].describe(</span>
+<span id="cb6-5"><a href=""></a>    percentiles<span class="op">=</span>[<span class="fl">0.25</span>, <span class="fl">0.5</span>, <span class="fl">0.75</span>]</span>
+<span id="cb6-6"><a href=""></a>).T.<span class="bu">round</span>(<span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>What to check:</strong></p>
+<ul>
+<li><strong>Mean vs median:</strong> large gap = skew → log-transform?</li>
+<li><strong>Std dev:</strong> larger than mean = high variance → winsorize?</li>
+<li><strong>Min/max:</strong> impossible values? (negative assets, RoA &lt; -1)</li>
+<li><strong>Count:</strong> fewer than total rows = missing values</li>
+</ul>
+<div class="box">
+<p>If <code>count</code> for your X variable is much less than total rows, you have a missing data problem. Check <code>df["xrd"].isna().sum()</code>.</p>
+</div>
+</div><div class="column" style="width:48%;">
+<p><strong>Correlation matrix</strong></p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href=""></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb7-2"><a href=""></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb7-3"><a href=""></a></span>
+<span id="cb7-4"><a href=""></a>corr <span class="op">=</span> df[<span class="bu">vars</span>].corr().<span class="bu">round</span>(<span class="dv">2</span>)</span>
+<span id="cb7-5"><a href=""></a>mask <span class="op">=</span> np.triu(np.ones_like(corr, dtype<span class="op">=</span><span class="bu">bool</span>))</span>
+<span id="cb7-6"><a href=""></a>sns.heatmap(corr, mask<span class="op">=</span>mask, annot<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb7-7"><a href=""></a>            cmap<span class="op">=</span><span class="st">"RdYlBu_r"</span>, center<span class="op">=</span><span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>What to check:</strong></p>
+<ul>
+<li><strong>X vs Y:</strong> is there a raw correlation with your DV?</li>
+<li><strong>X vs controls:</strong> multicollinearity if r &gt; 0.8</li>
+<li><strong>Between controls:</strong> if two controls correlate &gt; 0.8, consider dropping one</li>
+</ul>
+<p><strong>Rule of thumb:</strong> r &gt; 0.8 between two independent variables → multicollinearity risk → check Variance Inflation Factor (VIF)</p>
+</div></div>
+</section>
+<section id="visualizing-the-main-relationship" class="slide level2">
+<h2>Visualizing the Main Relationship</h2>
+<div class="sourceCode" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href=""></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb8-2"><a href=""></a></span>
+<span id="cb8-3"><a href=""></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">13</span>, <span class="dv">5</span>))</span>
+<span id="cb8-4"><a href=""></a></span>
+<span id="cb8-5"><a href=""></a><span class="co"># Left: raw scatter + bin means (shows the pattern without assuming linearity)</span></span>
+<span id="cb8-6"><a href=""></a>axes[<span class="dv">0</span>].scatter(df[<span class="st">"rd_intensity"</span>], df[<span class="st">"roa"</span>],</span>
+<span id="cb8-7"><a href=""></a>                alpha<span class="op">=</span><span class="fl">0.05</span>, s<span class="op">=</span><span class="dv">5</span>, color<span class="op">=</span><span class="st">"#002f5f"</span>)</span>
+<span id="cb8-8"><a href=""></a>bins <span class="op">=</span> pd.cut(df[<span class="st">"rd_intensity"</span>], bins<span class="op">=</span><span class="dv">20</span>)</span>
+<span id="cb8-9"><a href=""></a>bm   <span class="op">=</span> df.groupby(bins, observed<span class="op">=</span><span class="va">True</span>)[[<span class="st">"rd_intensity"</span>, <span class="st">"roa"</span>]].mean()</span>
+<span id="cb8-10"><a href=""></a>axes[<span class="dv">0</span>].plot(bm[<span class="st">"rd_intensity"</span>], bm[<span class="st">"roa"</span>],</span>
+<span id="cb8-11"><a href=""></a>             color<span class="op">=</span><span class="st">"#c8102e"</span>, lw<span class="op">=</span><span class="fl">2.5</span>, label<span class="op">=</span><span class="st">"Bin mean"</span>)</span>
+<span id="cb8-12"><a href=""></a>axes[<span class="dv">0</span>].set_xlabel(<span class="st">"R&amp;D Intensity"</span>)<span class="op">;</span> axes[<span class="dv">0</span>].set_ylabel(<span class="st">"RoA"</span>)</span>
+<span id="cb8-13"><a href=""></a>axes[<span class="dv">0</span>].set_title(<span class="st">"R&amp;D Intensity vs. RoA"</span>)</span>
+<span id="cb8-14"><a href=""></a>axes[<span class="dv">0</span>].legend()</span>
+<span id="cb8-15"><a href=""></a></span>
+<span id="cb8-16"><a href=""></a><span class="co"># Right: distribution of DV</span></span>
+<span id="cb8-17"><a href=""></a>axes[<span class="dv">1</span>].hist(df[<span class="st">"roa"</span>], bins<span class="op">=</span><span class="dv">60</span>, color<span class="op">=</span><span class="st">"#002f5f"</span>, alpha<span class="op">=</span><span class="fl">0.7</span>)</span>
+<span id="cb8-18"><a href=""></a>axes[<span class="dv">1</span>].axvline(df[<span class="st">"roa"</span>].mean(), color<span class="op">=</span><span class="st">"#c8102e"</span>, lw<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="st">"Mean"</span>)</span>
+<span id="cb8-19"><a href=""></a>axes[<span class="dv">1</span>].set_xlabel(<span class="st">"RoA"</span>)<span class="op">;</span> axes[<span class="dv">1</span>].set_title(<span class="st">"Distribution of RoA"</span>)</span>
+<span id="cb8-20"><a href=""></a>axes[<span class="dv">1</span>].legend()</span>
+<span id="cb8-21"><a href=""></a></span>
+<span id="cb8-22"><a href=""></a>fig.savefig(<span class="st">"output/figures/main_relationship.png"</span>, dpi<span class="op">=</span><span class="dv">150</span>, bbox_inches<span class="op">=</span><span class="st">"tight"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="box">
+<p><strong>Why bin means?</strong> A raw scatter with 50,000 points is unreadable. Bin means show the average Y at each level of X — revealing the shape of the relationship without imposing a functional form.</p>
+</div>
+</section>
+<section id="regression-fundamentals-ols-recap" class="slide level2" data-background-color="#002f5f">
+<h2>Regression Fundamentals — OLS Recap</h2>
+<p><strong>The OLS model:</strong></p>
+<p><span class="math display">\[Y_i = \alpha + \beta_1 X_{1i} + \beta_2 X_{2i} + \cdots + \beta_k X_{ki} + \varepsilon_i\]</span></p>
+<ul>
+<li><span class="math inline">\(Y_i\)</span> — dependent variable (e.g.&nbsp;RoA)</li>
+<li><span class="math inline">\(X_{ki}\)</span> — independent variables (R&amp;D intensity, controls)</li>
+<li><span class="math inline">\(\beta_k\)</span> — coefficients: effect of a 1-unit change in <span class="math inline">\(X_k\)</span> on <span class="math inline">\(Y\)</span>, holding all other variables constant (<strong>ceteris paribus</strong>)</li>
+<li><span class="math inline">\(\varepsilon_i\)</span> — error term (everything not captured by the model)</li>
+</ul>
+<p><strong>OLS minimizes the sum of squared residuals:</strong></p>
+<p><span class="math display">\[\hat{\beta} = \arg\min_\beta \sum_{i=1}^n (Y_i - \hat{Y}_i)^2\]</span></p>
+<p><strong>Key OLS assumptions (Gauss-Markov):</strong></p>
+<ol type="1">
+<li>Linearity in parameters</li>
+<li>Random sampling</li>
+<li>No perfect multicollinearity</li>
+<li>Zero conditional mean of errors: <span class="math inline">\(E[\varepsilon | X] = 0\)</span></li>
+<li>Homoskedasticity: <span class="math inline">\(Var(\varepsilon | X) = \sigma^2\)</span></li>
+</ol>
+</section>
+<section id="reading-ols-output" class="slide level2" data-background-color="#f0f4f9">
+<h2>Reading OLS Output</h2>
+<div class="sourceCode" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href=""></a><span class="im">import</span> statsmodels.formula.api <span class="im">as</span> smf</span>
+<span id="cb9-2"><a href=""></a></span>
+<span id="cb9-3"><a href=""></a>model <span class="op">=</span> smf.ols(<span class="st">"roa ~ rd_intensity + ln_at + leverage + age"</span>, data<span class="op">=</span>df)</span>
+<span id="cb9-4"><a href=""></a>result <span class="op">=</span> model.fit()</span>
+<span id="cb9-5"><a href=""></a><span class="bu">print</span>(result.summary())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>What to read:</strong></p>
+<div class="small">
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Output element</th>
+<th>What it means</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>coef</strong></td>
+<td>Estimated β — direction and magnitude of effect</td>
+</tr>
+<tr class="even">
+<td><strong>std err</strong></td>
+<td>Uncertainty around the estimate</td>
+</tr>
+<tr class="odd">
+<td><strong>t</strong></td>
+<td>coef / std err — how many standard errors from zero</td>
+</tr>
+<tr class="even">
+<td><strong>P&gt;|t|</strong></td>
+<td>p-value: probability of seeing this result if β = 0</td>
+</tr>
+<tr class="odd">
+<td><strong>[0.025, 0.975]</strong></td>
+<td>95% confidence interval — should not include 0</td>
+</tr>
+<tr class="even">
+<td><strong>R²</strong></td>
+<td>Share of variance in Y explained by the model</td>
+</tr>
+<tr class="odd">
+<td><strong>F-statistic</strong></td>
+<td>Joint significance of all variables</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="box">
+<p><strong>Stars:</strong> *** p&lt;0.01 &nbsp;&nbsp; ** p&lt;0.05 &nbsp;&nbsp; * p&lt;0.10 &nbsp;&nbsp; Conventional thresholds — arbitrary but universal.</p>
+</div>
+</section>
+<section id="the-problem-with-ols-for-panel-data" class="slide level2">
+<h2>The Problem with OLS for Panel Data</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><strong>OLS assumes observations are independent.</strong> In panel data they are not:</p>
+<ul>
+<li>Firm A in 2018 and 2019 are correlated (same firm)</li>
+<li>Firm A and Firm B may differ systematically in ways we don’t observe (management quality, culture, location advantages)</li>
+</ul>
+<p><strong>Omitted variable bias:</strong></p>
+<p><span class="math display">\[\text{True model: } Y_{it} = \alpha + \beta X_{it} + \gamma Z_i + \varepsilon_{it}\]</span></p>
+<p>If <span class="math inline">\(Z_i\)</span> (unobserved, time-invariant) correlates with <span class="math inline">\(X_{it}\)</span>, OLS estimate of <span class="math inline">\(\beta\)</span> is <strong>biased</strong>.</p>
+<p><strong>Example:</strong> innovative firms (high R&amp;D) may also have better management — we can’t measure management, but it affects RoA.</p>
+</div><div class="column" style="width:48%;">
+<p><strong>Visualizing the problem:</strong></p>
+<pre><code>         Firm A (high mgmt quality)
+RoA ↑     ●  ●  ●
+          ●  ●
+         Firm B (low mgmt quality)
+          ●  ●
+          ●  ●  ●
+
+         ───────────────→ R&amp;D intensity</code></pre>
+<p>OLS sees a positive slope across all dots.<br>
+But <strong>within</strong> each firm the slope may be flat or negative.</p>
+<p><strong>Fixed effects solution:</strong> control for all time-invariant firm characteristics by including a dummy for each firm (<span class="math inline">\(\mu_i\)</span>).</p>
+<p><span class="math display">\[Y_{it} = \beta X_{it} + \gamma Z_{it} + \mu_i + \lambda_t + \varepsilon_{it}\]</span></p>
+</div></div>
+</section>
+<section id="the-firm-year-panel-structure" class="slide level2">
+<h2>The Firm-Year Panel Structure</h2>
+<p><span class="math display">\[Y_{it} = \beta X_{it} + \gamma Z_{it} + \mu_i + \lambda_t + \varepsilon_{it}\]</span></p>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><strong>Two dimensions:</strong></p>
+<ul>
+<li><span class="math inline">\(i\)</span> = firm (entity dimension)</li>
+<li><span class="math inline">\(t\)</span> = fiscal year (time dimension)</li>
+</ul>
+<p><strong>Two types of fixed effects:</strong></p>
+<ul>
+<li><span class="math inline">\(\mu_i\)</span> = <strong>firm fixed effects</strong> — absorb all time-invariant firm characteristics (country, industry, founder quality, culture)</li>
+<li><span class="math inline">\(\lambda_t\)</span> = <strong>year fixed effects</strong> — absorb common shocks affecting all firms in a given year (financial crisis, COVID, policy changes)</li>
+</ul>
+<p><strong>Together:</strong> two-way fixed effects (TWFE) — the standard in empirical IB research</p>
+</div><div class="column" style="width:48%;">
+<div class="sourceCode" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href=""></a><span class="im">from</span> linearmodels.panel <span class="im">import</span> PanelOLS</span>
+<span id="cb11-2"><a href=""></a></span>
+<span id="cb11-3"><a href=""></a><span class="co"># Requires MultiIndex: (entity, time)</span></span>
+<span id="cb11-4"><a href=""></a>df_panel <span class="op">=</span> df.set_index([<span class="st">"gvkey"</span>, <span class="st">"fyear"</span>])</span>
+<span id="cb11-5"><a href=""></a></span>
+<span id="cb11-6"><a href=""></a>model <span class="op">=</span> PanelOLS.from_formula(</span>
+<span id="cb11-7"><a href=""></a>    <span class="st">"roa ~ rd_intensity + ln_at + "</span></span>
+<span id="cb11-8"><a href=""></a>    <span class="st">"leverage + age + "</span></span>
+<span id="cb11-9"><a href=""></a>    <span class="st">"EntityEffects + TimeEffects"</span>,</span>
+<span id="cb11-10"><a href=""></a>    data<span class="op">=</span>df_panel</span>
+<span id="cb11-11"><a href=""></a>)</span>
+<span id="cb11-12"><a href=""></a></span>
+<span id="cb11-13"><a href=""></a>result <span class="op">=</span> model.fit(</span>
+<span id="cb11-14"><a href=""></a>    cov_type<span class="op">=</span><span class="st">"clustered"</span>,</span>
+<span id="cb11-15"><a href=""></a>    cluster_entity<span class="op">=</span><span class="va">True</span>    <span class="co"># cluster SEs at firm level</span></span>
+<span id="cb11-16"><a href=""></a>)</span>
+<span id="cb11-17"><a href=""></a><span class="bu">print</span>(result.summary)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="box">
+<p><strong>Clustered standard errors:</strong> firms have correlated errors over time. Clustering at the firm level corrects for this — otherwise SEs are too small and t-stats too large.</p>
+</div>
+</div></div>
+</section>
+<section id="six-panel-regression-methods" class="slide level2" data-background-color="#f0f4f9">
+<h2>Six Panel Regression Methods</h2>
+<div class="small">
+<table class="caption-top">
+<colgroup>
+<col style="width: 17%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 23%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>When to use</th>
+<th>Key assumption</th>
+<th>In Python</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Pooled OLS</strong></td>
+<td>Baseline only — ignores panel structure</td>
+<td>Obs. independent</td>
+<td><code>smf.ols()</code></td>
+</tr>
+<tr class="even">
+<td><strong>Random Effects (RE)</strong></td>
+<td>Unobserved heterogeneity uncorrelated with X</td>
+<td>Strict exogeneity</td>
+<td><code>RandomEffects</code></td>
+</tr>
+<tr class="odd">
+<td><strong>Fixed Effects (FE)</strong></td>
+<td>Unobserved heterogeneity may correlate with X</td>
+<td>Within-firm variation in X</td>
+<td><code>PanelOLS + EntityEffects</code></td>
+</tr>
+<tr class="even">
+<td><strong>Two-way FE (TWFE)</strong></td>
+<td>FE + common time shocks</td>
+<td>—</td>
+<td><code>+ TimeEffects</code></td>
+</tr>
+<tr class="odd">
+<td><strong>First Differences (FD)</strong></td>
+<td>Non-stationary panels, unit roots</td>
+<td>Errors not serially correlated</td>
+<td><code>FirstDifferenceOLS</code></td>
+</tr>
+<tr class="even">
+<td><strong>Between Effects (BE)</strong></td>
+<td>Cross-sectional variation only</td>
+<td>Obs. independent across firms</td>
+<td><code>BetweenOLS</code></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>How to choose:</strong></p>
+<ol type="1">
+<li><strong>Always start with TWFE</strong> — it is the most conservative and credible</li>
+<li><strong>Hausman test:</strong> if RE is consistent, use RE (more efficient); if not, use FE</li>
+<li><strong>FD</strong> if you suspect non-stationarity (trending variables like assets)</li>
+<li><strong>BE</strong> only if you have a specific cross-sectional research question</li>
+</ol>
+<div class="box">
+<p>For this course: <strong>TWFE with clustered SEs</strong> is the standard. Always report it. Add RE as a robustness check.</p>
+</div>
+</section>
+<section id="hausman-test-fe-or-re" class="slide level2">
+<h2>Hausman Test — FE or RE?</h2>
+<div class="sourceCode" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href=""></a><span class="im">from</span> linearmodels.panel <span class="im">import</span> RandomEffects, PanelOLS</span>
+<span id="cb12-2"><a href=""></a><span class="im">from</span> linearmodels.panel.model <span class="im">import</span> compare</span>
+<span id="cb12-3"><a href=""></a></span>
+<span id="cb12-4"><a href=""></a><span class="co"># Run both</span></span>
+<span id="cb12-5"><a href=""></a>fe <span class="op">=</span> PanelOLS.from_formula(</span>
+<span id="cb12-6"><a href=""></a>    <span class="st">"roa ~ rd_intensity + ln_at + leverage + EntityEffects"</span>,</span>
+<span id="cb12-7"><a href=""></a>    data<span class="op">=</span>df_panel).fit()</span>
+<span id="cb12-8"><a href=""></a></span>
+<span id="cb12-9"><a href=""></a>re <span class="op">=</span> RandomEffects.from_formula(</span>
+<span id="cb12-10"><a href=""></a>    <span class="st">"roa ~ rd_intensity + ln_at + leverage"</span>,</span>
+<span id="cb12-11"><a href=""></a>    data<span class="op">=</span>df_panel).fit()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Logic of the Hausman test:</strong></p>
+<ul>
+<li><strong>H₀:</strong> RE is consistent (unobserved effects uncorrelated with X) → prefer RE (more efficient)</li>
+<li><strong>H₁:</strong> RE is inconsistent (correlation exists) → use FE</li>
+</ul>
+<p><span class="math display">\[H = (\hat{\beta}_{FE} - \hat{\beta}_{RE})' [\text{Var}(\hat{\beta}_{FE}) - \text{Var}(\hat{\beta}_{RE})]^{-1} (\hat{\beta}_{FE} - \hat{\beta}_{RE}) \sim \chi^2_k\]</span></p>
+<div class="box">
+<p><strong>In practice for IB research:</strong> most scholars default to FE because the assumption that firm-level unobservables are uncorrelated with R&amp;D or internationalization is hard to defend theoretically. Use the Hausman test as confirmation, not as the primary decision criterion.</p>
+</div>
+</section>
+<section id="limited-dependent-variable-models" class="slide level2">
+<h2>Limited Dependent Variable Models</h2>
+<p><strong>When your Y is not continuous:</strong></p>
+<div class="small">
+<table class="caption-top">
+<colgroup>
+<col style="width: 26%">
+<col style="width: 26%">
+<col style="width: 20%">
+<col style="width: 26%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>DV type</th>
+<th>Example</th>
+<th>Model</th>
+<th>Command</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Binary (0/1)</strong></td>
+<td>Firm entered foreign market: yes/no</td>
+<td>Logit / Probit</td>
+<td><code>smf.logit()</code> / <code>smf.probit()</code></td>
+</tr>
+<tr class="even">
+<td><strong>Count (0,1,2,…)</strong></td>
+<td>Number of export markets</td>
+<td>Poisson / Neg. Binomial</td>
+<td><code>smf.poisson()</code></td>
+</tr>
+<tr class="odd">
+<td><strong>Censored</strong></td>
+<td>Export share (many zeros)</td>
+<td>Tobit</td>
+<td><code>statsmodels.tobit</code></td>
+</tr>
+<tr class="even">
+<td><strong>Ordered</strong></td>
+<td>Survey: agree/neutral/disagree</td>
+<td>Ordered logit</td>
+<td><code>statsmodels.MNLogit</code></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Logit interpretation:</strong></p>
+<p><span class="math display">\[\ln\left(\frac{p}{1-p}\right) = \alpha + \beta X\]</span></p>
+<p>Coefficients are <strong>log-odds</strong> — not directly interpretable. Convert to <strong>odds ratios</strong>: <span class="math inline">\(e^\beta\)</span></p>
+<div class="box">
+<p>For most SME performance research (RoA, RoE, sales growth) — continuous DV — you will use linear panel FE. Logit/Probit are relevant if your DV is “did the firm internationalize?” (binary) or “how many markets did it enter?” (count).</p>
+</div>
+</section>
+<section id="deciding-which-model-to-use" class="slide level2">
+<h2>Deciding Which Model to Use</h2>
+<pre><code>Is your DV continuous?
+├── YES → Does your data have a panel structure (firm × year)?
+│         ├── YES → Use TWFE (PanelOLS + EntityEffects + TimeEffects)
+│         │         └── Run Hausman test to confirm FE &gt; RE
+│         └── NO  → Use OLS (smf.ols)
+│
+└── NO  → What type?
+          ├── Binary (0/1)    → Logit or Probit
+          ├── Count (0,1,2..) → Poisson or Negative Binomial
+          ├── Censored (many zeros) → Tobit
+          └── Ordered categories → Ordered Logit</code></pre>
+<div class="box">
+<p><strong>For this course:</strong> your DV (RoA, leverage ratio, sales growth) is continuous and your data is a firm-year panel → <strong>always use TWFE</strong> as your main specification.</p>
+</div>
+</section>
+<section id="now-live-code-03_descriptives.py" class="slide level2" data-background-color="#002f5f">
+<h2>Now: Live Code — <code>03_descriptives.py</code></h2>
+<div class="columns">
+<div class="column" style="width:55%;">
+<p><strong>What the script does</strong></p>
+<ol type="1">
+<li>Loads <code>panel_clean.parquet</code></li>
+<li>Constructs research variables (RoA, R&amp;D intensity, leverage, etc.)</li>
+<li>Applies SME filter (emp &lt; 0.25 OR at ≤ 43)</li>
+<li>Winsorizes at 1%–99%</li>
+<li>Saves summary statistics → <code>output/tables/</code></li>
+<li>Saves correlation matrix → <code>output/figures/</code></li>
+<li>Saves main relationship plot → <code>output/figures/</code></li>
+<li>Saves <code>data/processed/panel_with_vars.parquet</code> for regression</li>
+</ol>
+<p><strong>You need to adapt:</strong></p>
+<ul>
+<li>Variable construction to match your own Y and X</li>
+<li>The SME filter to match your sample definition</li>
+</ul>
+</div><div class="column" style="width:42%;">
+<p><strong>Output files:</strong></p>
+<pre><code>output/
+├── tables/
+│   └── summary_statistics.csv
+└── figures/
+    ├── correlation_matrix.png
+    ├── dv_distribution.png
+    └── main_relationship.png
+
+data/processed/
+└── panel_with_vars.parquet</code></pre>
+</div></div>
+</section>
+<section id="now-live-code-04_regression.py" class="slide level2" data-background-color="#002f5f">
+<h2>Now: Live Code — <code>04_regression.py</code></h2>
+<div class="columns">
+<div class="column" style="width:55%;">
+<p><strong>What the script does</strong></p>
+<ol type="1">
+<li>Loads <code>panel_with_vars.parquet</code></li>
+<li>Sets panel index (<code>gvkey</code>, <code>fyear</code>)</li>
+<li><strong>Model 1:</strong> Pooled OLS baseline</li>
+<li><strong>Model 2:</strong> TWFE — main specification</li>
+<li><strong>Model 3:</strong> TWFE + interaction term (H2)</li>
+<li>Prints formatted results table</li>
+<li>Saves results → <code>output/tables/regression_results.csv</code></li>
+</ol>
+<p><strong>You need to adapt:</strong></p>
+<ul>
+<li>Formula strings to use your own variable names</li>
+<li>Interaction term to match your H2</li>
+</ul>
+<p><strong>Reading the output:</strong></p>
+<ul>
+<li>β(X) significant and positive → X increases Y</li>
+<li>β(X²) negative → inverted U-shape (H1)</li>
+<li>β(X × moderator) positive → positive moderation (H2)</li>
+</ul>
+</div><div class="column" style="width:42%;">
+<p><strong>Regression table structure:</strong></p>
+<pre><code>                    (1)      (2)      (3)
+                   OLS      FE      FE+Int
+────────────────────────────────────────
+rd_intensity     0.045** 0.038**  0.041**
+                (0.018)  (0.015)  (0.016)
+
+ln_at           -0.012  -0.008   -0.009
+                (0.009)  (0.007)  (0.007)
+
+leverage        -0.031** -0.025* -0.026*
+                (0.012)  (0.013)  (0.013)
+
+Firm FE           No      Yes      Yes
+Year FE           No      Yes      Yes
+Clustered SE      No      Yes      Yes
+N              12,451   12,451   12,451
+R²              0.042    0.318    0.321
+────────────────────────────────────────
+* p&lt;0.10  ** p&lt;0.05  *** p&lt;0.01</code></pre>
+</div></div>
+</section>
+<section id="after-today-what-to-adapt-in-your-own-scripts" class="slide level2">
+<h2>After Today — What to Adapt in Your Own Scripts</h2>
+<div class="small">
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Step</th>
+<th>In <code>03_descriptives.py</code></th>
+<th>In <code>04_regression.py</code></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Variables</strong></td>
+<td>Change formula for Y and X</td>
+<td>Change formula string</td>
+</tr>
+<tr class="even">
+<td><strong>Sample</strong></td>
+<td>Adjust SME filter for your sample</td>
+<td>—</td>
+</tr>
+<tr class="odd">
+<td><strong>Winsorize</strong></td>
+<td>Add/remove variables from the list</td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td><strong>Plots</strong></td>
+<td>Change axis labels to your variable names</td>
+<td>—</td>
+</tr>
+<tr class="odd">
+<td><strong>H1 test</strong></td>
+<td>—</td>
+<td>Add X² term if testing non-linearity</td>
+</tr>
+<tr class="even">
+<td><strong>H2 test</strong></td>
+<td>—</td>
+<td>Change interaction term to your moderator</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="box">
+<p><strong>Commit after adapting:</strong></p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb16-1"><a href=""></a><span class="fu">git</span> add code/03_descriptives.py code/04_regression.py</span>
+<span id="cb16-2"><a href=""></a><span class="fu">git</span> commit <span class="at">-m</span> <span class="st">"session 6: descriptives and regression for [your topic]"</span></span>
+<span id="cb16-3"><a href=""></a><span class="fu">git</span> push</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="looking-ahead-session-7-final" class="slide level2">
+<h2>Looking Ahead — Session 7 (Final)</h2>
+<table class="caption-top">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Task</th>
+<th>What</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Research note</strong></td>
+<td>Write up results in <code>research_note.md</code> using Quarto</td>
+</tr>
+<tr class="even">
+<td><strong>Insert tables</strong></td>
+<td>Reference <code>output/tables/</code> in your note</td>
+</tr>
+<tr class="odd">
+<td><strong>Insert figures</strong></td>
+<td>Reference <code>output/figures/</code> in your note</td>
+</tr>
+<tr class="even">
+<td><strong>BibTeX</strong></td>
+<td>Cite using <code>[@AuthorYear]</code> from <code>library.bib</code></td>
+</tr>
+<tr class="odd">
+<td><strong>Render</strong></td>
+<td><code>quarto render research_note.md</code> → PDF</td>
+</tr>
+<tr class="even">
+<td><strong>Peer review</strong></td>
+<td>Clone a classmate’s repo, run <code>task all</code>, check reproducibility</td>
+</tr>
+<tr class="odd">
+<td><strong>Submission</strong></td>
+<td>Push final version, share GitHub link</td>
+</tr>
+</tbody>
+</table>
+<div class="blue-box">
+<p><strong>Before Session 7:</strong> make sure <code>task all</code> runs end-to-end on your machine and produces results in <code>output/</code>. Your research note should already have your RQ, hypotheses, and variable table from earlier sessions.</p>
+</div>
+
+</section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+<p>ExInt II · WU Vienna · SS 2026</p>
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="session06_slides_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="session06_slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="session06_slides_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="session06_slides_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="session06_slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="session06_slides_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="session06_slides_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="session06_slides_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="session06_slides_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="session06_slides_files/libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'fade',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1280,
+
+        height: 720,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        math: {
+          mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <script id="quarto-html-after-body" type="application/javascript">
+    window.document.addEventListener("DOMContentLoaded", function (event) {
+      const toggleBodyColorMode = (bsSheetEl) => {
+        const mode = bsSheetEl.getAttribute("data-mode");
+        const bodyEl = window.document.querySelector("body");
+        if (mode === "dark") {
+          bodyEl.classList.add("quarto-dark");
+          bodyEl.classList.remove("quarto-light");
+        } else {
+          bodyEl.classList.add("quarto-light");
+          bodyEl.classList.remove("quarto-dark");
+        }
+      }
+      const toggleBodyColorPrimary = () => {
+        const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+        if (bsSheetEl) {
+          toggleBodyColorMode(bsSheetEl);
+        }
+      }
+      toggleBodyColorPrimary();  
+      const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+      tabsets.forEach(function(tabset) {
+        const tabby = new Tabby('#' + tabset.id);
+      });
+      const isCodeAnnotation = (el) => {
+        for (const clz of el.classList) {
+          if (clz.startsWith('code-annotation-')) {                     
+            return true;
+          }
+        }
+        return false;
+      }
+      const onCopySuccess = function(e) {
+        // button target
+        const button = e.trigger;
+        // don't keep focus
+        button.blur();
+        // flash "checked"
+        button.classList.add('code-copy-button-checked');
+        var currentTitle = button.getAttribute("title");
+        button.setAttribute("title", "Copied!");
+        let tooltip;
+        if (window.bootstrap) {
+          button.setAttribute("data-bs-toggle", "tooltip");
+          button.setAttribute("data-bs-placement", "left");
+          button.setAttribute("data-bs-title", "Copied!");
+          tooltip = new bootstrap.Tooltip(button, 
+            { trigger: "manual", 
+              customClass: "code-copy-button-tooltip",
+              offset: [0, -8]});
+          tooltip.show();    
+        }
+        setTimeout(function() {
+          if (tooltip) {
+            tooltip.hide();
+            button.removeAttribute("data-bs-title");
+            button.removeAttribute("data-bs-toggle");
+            button.removeAttribute("data-bs-placement");
+          }
+          button.setAttribute("title", currentTitle);
+          button.classList.remove('code-copy-button-checked');
+        }, 1000);
+        // clear code selection
+        e.clearSelection();
+      }
+      const getTextToCopy = function(trigger) {
+          const codeEl = trigger.previousElementSibling.cloneNode(true);
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+      }
+      const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+        text: getTextToCopy
+      });
+      clipboard.on('success', onCopySuccess);
+      if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+        const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+          text: getTextToCopy,
+          container: window.document.getElementById('quarto-embedded-source-code-modal')
+        });
+        clipboardModal.on('success', onCopySuccess);
+      }
+        var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+        var mailtoRegex = new RegExp(/^mailto:/);
+          var filterRegex = new RegExp('/' + window.location.host + '/');
+        var isInternal = (href) => {
+            return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+        }
+        // Inspect non-navigation links and adorn them if external
+     	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+        for (var i=0; i<links.length; i++) {
+          const link = links[i];
+          if (!isInternal(link.href)) {
+            // undo the damage that might have been done by quarto-nav.js in the case of
+            // links that we want to consider external
+            if (link.dataset.originalHref !== undefined) {
+              link.href = link.dataset.originalHref;
+            }
+          }
+        }
+      function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+        const config = {
+          allowHTML: true,
+          maxWidth: 500,
+          delay: 100,
+          arrow: false,
+          appendTo: function(el) {
+              return el.closest('section.slide') || el.parentElement;
+          },
+          interactive: true,
+          interactiveBorder: 10,
+          theme: 'light-border',
+          placement: 'bottom-start',
+        };
+        if (contentFn) {
+          config.content = contentFn;
+        }
+        if (onTriggerFn) {
+          config.onTrigger = onTriggerFn;
+        }
+        if (onUntriggerFn) {
+          config.onUntrigger = onUntriggerFn;
+        }
+          config['offset'] = [0,0];
+          config['maxWidth'] = 700;
+        window.tippy(el, config); 
+      }
+      const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+      for (var i=0; i<noterefs.length; i++) {
+        const ref = noterefs[i];
+        tippyHover(ref, function() {
+          // use id or data attribute instead here
+          let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+          try { href = new URL(href).hash; } catch {}
+          const id = href.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note) {
+            return note.innerHTML;
+          } else {
+            return "";
+          }
+        });
+      }
+      const findCites = (el) => {
+        const parentEl = el.parentElement;
+        if (parentEl) {
+          const cites = parentEl.dataset.cites;
+          if (cites) {
+            return {
+              el,
+              cites: cites.split(' ')
+            };
+          } else {
+            return findCites(el.parentElement)
+          }
+        } else {
+          return undefined;
+        }
+      };
+      var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+      for (var i=0; i<bibliorefs.length; i++) {
+        const ref = bibliorefs[i];
+        const citeInfo = findCites(ref);
+        if (citeInfo) {
+          tippyHover(citeInfo.el, function() {
+            var popup = window.document.createElement('div');
+            citeInfo.cites.forEach(function(cite) {
+              var citeDiv = window.document.createElement('div');
+              citeDiv.classList.add('hanging-indent');
+              citeDiv.classList.add('csl-entry');
+              var biblioDiv = window.document.getElementById('ref-' + cite);
+              if (biblioDiv) {
+                citeDiv.innerHTML = biblioDiv.innerHTML;
+              }
+              popup.appendChild(citeDiv);
+            });
+            return popup.innerHTML;
+          });
+        }
+      }
+    });
+    </script>
+    
+
+</body></html>
