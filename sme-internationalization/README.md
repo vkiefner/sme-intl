@@ -1,119 +1,139 @@
-# SME Internationalization & Firm Performance
+# R&D Intensity & Firm Performance among European SMEs
 ### ExInt II: Research Designs in SME Research | WU Vienna | SS 2026
 
+---
 
 ## Research Question
 
-> Does degree of internationalization (DOI) exhibit an inverted U-shaped relationship with firm performance among European SMEs, and does R&D intensity moderate this relationship?
+> Does R&D intensity positively affect firm performance among European SMEs,
+> and does firm size moderate this relationship?
 
 ## Theoretical Background
 
-| Theory | Key claim | Implication for DOI–performance |
+| Theory | Key claim | Implication for R&D–performance |
 |--------|-----------|----------------------------------|
-| Internalization theory (Buckley & Casson 1976) | Firms internationalize to exploit firm-specific advantages | Initial expansion creates value |
-| Liability of foreignness (Zaheer 1995) | Foreign operations impose coordination and information costs | Costs increase with DOI |
-| SME internationalization (Lu & Beamish 2001) | Net effect is non-monotonic | Inverted U-shape |
-| Absorptive capacity (Cohen & Levinthal 1990) | R&D builds capacity to exploit external knowledge | R&D moderates the DOI–performance curve |
+| Absorptive capacity (Cohen & Levinthal 1990) | R&D builds capacity to exploit external knowledge | R&D investment improves long-run performance |
+| R&D expensing effect (Hall & Lerner 2010) | R&D is expensed immediately under IFRS | Short-run negative earnings effect; returns accrue with a lag |
+| Resource-based view (Penrose 1959) | Firm-specific resources drive competitive advantage | Larger firms have more absorptive capacity to exploit R&D |
+| SME innovation (Lu & Beamish 2001) | SMEs face resource constraints in R&D investment | Size moderates the R&D–performance relationship |
 
 ## Hypotheses
 
-- **H1:** DOI positively affects firm performance at low levels but the effect turns negative at high levels, producing an inverted U-shaped relationship. *(Test: β(DOI) > 0 and β(DOI²) < 0)*
-- **H2:** R&D intensity positively moderates the DOI–performance relationship. *(Test: β(DOI × R&D) > 0)*
+- **H1:** R&D intensity negatively affects RoA in the short run due to
+  immediate expensing under IFRS.
+- **H2:** Firm size positively moderates the R&D intensity–RoA relationship.
+
 
 ## Data
 
 | Item | Detail |
 |------|--------|
 | Source | WRDS / Compustat Global |
+| Table | comp_global_daily.g_funda |
 | Downloaded | [date of download] |
 | License | WRDS subscriber agreement |
+| Currency | EUR only (curcd = 'EUR') |
 | Sample | European SMEs (≤250 employees OR ≤€43m total assets) |
-| Period | 2005–2020 |
+| Quality filters | at > 0.1, sale > 0, seq > 0 |
+| Period | 2015–2024 |
 | Unit of analysis | Firm-year |
+| Raw rows | [from pull_metadata.txt] |
+| Clean rows | [from data/processed/clean_log.txt] |
 
-**Key variables:**
+**Note on DOI variable:** `pifo` (foreign income) is not available in
+Compustat Global. `rect/sale` (receivables/sales) was evaluated as a
+DOI proxy but produced extreme outliers for SMEs with volatile sales.
+The research question was updated to focus on R&D intensity, which has
+100% coverage and stronger theoretical grounding for this sample.
 
-| Variable | Compustat field(s) | Description |
-|----------|-------------------|-------------|
-| ROA | `ib / at` | Return on assets (performance) |
-| DOI | `pifo / sale` | Foreign income share |
-| DOI² | `(pifo / sale)²` | Non-linearity test (H1) |
-| R&D intensity | `xrd / at` | R&D expenditure / total assets |
-| DOI × R&D | interaction | Moderation test (H2) |
-| Firm size | `log(at)` | Log total assets |
-| Leverage | `dltt / at` | Long-term debt / total assets |
-| Age | `fyear - inco` | Years since incorporation |
+## Key Variables
+
+| Variable | Compustat field(s) | Formula | Role |
+|----------|-------------------|---------|------|
+| RoA | `ib`, `at` | `ib / at` | Dependent (Y) |
+| R&D intensity | `xrd`, `at` | `xrd.fillna(0) / at` | Independent (X) |
+| R&D × Size | — | `rd_intensity × ln_at` | H2 interaction |
+| Firm size | `at` | `log(at)` | Moderator + Control |
+| Leverage | `dltt`, `at` | `dltt / at` | Control |
+| CAPX intensity | `capx`, `at` | `capx / at` | Control |
+| Cash ratio | `che`, `at` | `che / at` | Control |
+
+All continuous variables winsorized at 1st–99th percentiles.
+
+## Main Results
+
+| Model | β(R&D intensity) | β(R&D × Size) | Firm FE | Year FE |
+|-------|-----------------|---------------|---------|---------|
+| (1) Pooled OLS | -0.796*** | — | No | No |
+| (2) TWFE | -0.535*** | — | Yes | Yes |
+| (3) TWFE + H2 | -0.635*** | 0.038 (n.s.) | Yes | Yes |
+
+**H1:** R&D intensity significantly reduces current-period RoA (β = -0.535,
+p < 0.01). This is consistent with R&D expensing under IFRS — costs are
+recognized immediately while performance returns accrue with a multi-year lag.
+The OLS estimate (-0.796) is substantially larger in magnitude than the FE
+estimate (-0.535), indicating substantial omitted variable bias when firm
+fixed effects are omitted.
+
+**H2:** The interaction between R&D intensity and firm size is positive but
+not statistically significant (β = 0.038, p = 0.559). H2 is not supported.
 
 ## How to Reproduce
 
 ```bash
-# 1. Clone the repository
 git clone https://github.com/vkiefner/sme-intl
-cd exint2-example-project
-
-# 2. Create and activate virtual environment
+cd sme-internationalization
 python -m venv .venv
-source .venv/bin/activate        # Mac / Linux
+source .venv/bin/activate        # Mac/Linux
 # .venv\Scripts\activate         # Windows
-
-# 3. Install pinned dependencies
 pip install -r requirements.txt
-
-# 4. Set WRDS credentials
 cp .env.example .env
-# Open .env and add your WRDS username
-
-# 5. Run the full pipeline (one command)
+# Add your WRDS username to .env
 task all
-
-# --- Or run steps individually ---
-task pull          # 01_pull_data.py   → data/raw/
-task clean         # 02_clean.py       → data/processed/
-task descriptives  # 03_descriptives.py → output/
-task regression    # 04_regression.py  → output/tables/
-
-# 6. Render the research note to PDF
 quarto render research_note.md
 ```
 
 ## Project Structure
 
 ```
-exint2-example-project/
+sme-internationalization/
 ├── data/
-│   ├── raw/                   ← downloaded from WRDS (not tracked by Git)
-│   └── processed/             ← cleaned panel (regenerated by code)
+│   ├── raw/                   ← WRDS pull (not in Git)
+│   └── processed/             ← clean panel (not in Git)
 ├── code/
 │   ├── 01_pull_data.py        ← WRDS Compustat Global pull
-│   ├── 02_clean.py            ← SME filter, variable construction, winsorizing
-│   ├── 03_descriptives.py     ← summary stats, figures (Parquet output)
-│   └── 04_regression.py       ← panel FE regressions (linearmodels)
+│   ├── 02_clean.py            ← EUR filter, SME filter, quality filters
+│   ├── 03_descriptives.py     ← variable construction, summary stats, figures
+│   └── 04_regression.py       ← panel FE regressions
 ├── output/
-│   ├── tables/                ← regression tables (.csv)
-│   └── figures/               ← plots (.png)
+│   ├── tables/                ← summary_statistics.csv, regression_results.csv
+│   └── figures/               ← correlation_matrix.png, main_relationship.png
 ├── references/
-│   └── library.bib            ← auto-exported from Zotero (Better BibTeX)
-├── research_note.md           ← main output document (Quarto → PDF)
-├── Taskfile.yml               ← pipeline automation
-├── pyproject.toml             ← project config + ruff settings
-├── requirements.txt           ← pinned package versions
-├── .env.example               ← WRDS credentials template
+│   └── library.bib            ← Zotero auto-export (Better BibTeX)
+├── research_note.md           ← Quarto → PDF
+├── Taskfile.yml
+├── pyproject.toml
+├── requirements.txt
+├── .env.example
 ├── .gitignore
 └── README.md
 ```
 
 ## References
 
-Buckley, P. J., & Casson, M. (1976). *The future of the multinational enterprise*. Macmillan.
+Cohen, W. M., & Levinthal, D. A. (1990). Absorptive capacity: A new
+perspective on learning and innovation. *Administrative Science Quarterly*,
+35(1), 128–152.
 
-Cohen, W. M., & Levinthal, D. A. (1990). Absorptive capacity: A new perspective on learning and innovation. *Administrative Science Quarterly*, 35(1), 128–152.
+Hall, B. H., & Lerner, J. (2010). The financing of R&D and innovation.
+In B. H. Hall & N. Rosenberg (Eds.), *Handbook of the Economics of
+Innovation* (Vol. 1, pp. 609–639). Elsevier.
 
-Johanson, J., & Vahlne, J.-E. (1977). The Internationalization Process of the Firm—A Model of Knowledge Development and Increasing Foreign Market Commitments. *Journal of International Business Studies*, 8(1), 23–32.
+Lu, J. W., & Beamish, P. W. (2001). The internationalization and performance
+of SMEs. *Strategic Management Journal*, 22(6–7), 565–586.
 
-Lu, J. W., & Beamish, P. W. (2001). The internationalization and performance of SMEs. *Strategic Management Journal*, 22(6–7), 565–586.
+Penrose, E. T. (1959). *The theory of the growth of the firm*. Oxford
+University Press.
 
-Sullivan, D. (1994). Measuring the degree of internationalization of a firm. *Journal of International Business Studies*, 25(2), 325–342.
-
-Trisovic, A., et al. (2022). A large-scale study on research code quality and execution. *Scientific Data*, 9(1), 60.
-
-Zaheer, S. (1995). Overcoming the liability of foreignness. *Academy of Management Journal*, 38(2), 341–363.
+Trisovic, A., et al. (2022). A large-scale study on research code quality
+and execution. *Scientific Data*, 9(1), 60.
