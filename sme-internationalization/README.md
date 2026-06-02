@@ -5,7 +5,7 @@
 
 ## Research Question
 
-> Does R&D intensity positively affect firm performance among European SMEs,
+> Does R&D intensity negatively affect firm performance among European SMEs,
 > and does firm size moderate this relationship?
 
 ## Theoretical Background
