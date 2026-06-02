@@ -32,3 +32,9 @@ Thumbs.db
 # ── Editor ────────────────────────────────────────────────────────────────────
 .vscode/settings.json
 *.swp
+
+# ── Session Slide Files ───────────────────────────────────────────────────────
+Session04/session04_slides_files/
+Session05/session05_slides_files/
+Session06/session06_slides_files/   
+Session07/session07_slides_files/
