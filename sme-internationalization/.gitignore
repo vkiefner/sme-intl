@@ -15,7 +15,6 @@ data/processed/
 references/*.pdf
 
 # ── Quarto build artifacts (regenerate with task render) ──────────────────────
-research_note.pdf
 research_note.html
 research_note.tex
 research_note.log
