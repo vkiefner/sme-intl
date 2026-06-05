@@ -1,0 +1,396 @@
+---
+title: "Writing Up — Research Note, Quarto & Submission"
+subtitle: "Session 7 — ExInt II: Research Designs in SME Research"
+author: "WU Vienna | SS 2026"
+date: "June 2026"
+format:
+  revealjs:
+    theme: default
+    slide-number: true
+    footer: "ExInt II · WU Vienna · SS 2026"
+    transition: fade
+    highlight-style: github
+    code-line-numbers: true
+    width: 1280
+    height: 720
+    css: |
+      :root { --wu-blue: #002f5f; --wu-red: #c8102e; }
+      .reveal h1, .reveal h2 { color: var(--wu-blue); }
+      .reveal h3 { color: var(--wu-red); font-size: 0.95em; }
+      .box {
+        border-left: 4px solid var(--wu-red);
+        background: #f8f8f8;
+        padding: 0.5em 1em;
+        border-radius: 4px;
+        margin: 0.4em 0;
+        font-size: 0.87em;
+      }
+      .blue-box {
+        border: 2px solid var(--wu-blue);
+        background: #eef3f9;
+        padding: 0.6em 1em;
+        border-radius: 6px;
+        margin: 0.4em 0;
+        font-size: 0.87em;
+      }
+      .amj-box {
+        border-left: 4px solid #854F0B;
+        background: #FAEEDA;
+        padding: 0.5em 1em;
+        border-radius: 4px;
+        margin: 0.4em 0;
+        font-size: 0.85em;
+      }
+      .small { font-size: 0.80em; }
+      .tiny  { font-size: 0.68em; }
+      table  { font-size: 0.78em; }
+execute:
+  echo: true
+  eval: false
+---
+
+## Today at a Glance {background-color="#002f5f"}
+
+::: {.columns}
+::: {.column width="55%"}
+**What we cover**
+
+1. What makes a good research note (AMJ principles)
+2. Quarto — YAML, syntax, citations
+3. Figures and tables — fully automated
+4. Taskfile integration + `.qmd` extension
+5. Writing each section — live demo
+6. Rendering with `task all`
+7. Submission
+
+**Reference:** [github.com/vkiefner/sme-intl](https://github.com/vkiefner/sme-intl/){target="_blank"}
+:::
+::: {.column width="42%"}
+**What you submit by June 28**
+
+::: {.blue-box}
+📄 `research_note.pdf` via Canvas  
+🔗 GitHub URL on the **title page**  
+✅ `task all` runs full pipeline + renders PDF  
+✅ Examiner clones repo, runs `task all`, gets PDF
+:::
+:::
+:::
+
+---
+
+## What Makes a Good Research Note {background-color="#f0f4f9"}
+
+The AMJ "Publishing in AMJ" series (2011–2012) — same principles at research note scale:
+
+::: {.small}
+| Section | AMJ principle | Applied here |
+|---------|--------------|--------------|
+| **Introduction** | "Set the hook" — the gap, not the topic | What is unknown and why it matters |
+| **Theory** | Hypotheses must be derived, not asserted | Theory → mechanism → prediction → H |
+| **Data** | Document every sample choice | Filters, N, date range, variable table |
+| **Results** | Interpret, don't just report | Every coefficient: one plain-language sentence |
+| **Discussion** | "Broaden the return" — back to theory | What does your result mean for the theories you cited? |
+:::
+
+::: {.amj-box}
+**AMJ Part 3:** "The introduction should tell readers what you studied, why it is interesting, what you did, and what you found — in that order."
+
+**AMJ Part 4:** "A hypothesis is not a prediction. It is a theoretically derived argument."
+:::
+
+---
+
+## Good vs Weak — At a Glance
+
+::: {.small}
+| Element | Good | Weak |
+|---------|------|------|
+| **RQ** | One focused falsifiable question | Multiple vague questions |
+| **Theory** | 2–3 theories → mechanism → H | Theory listed, not used to derive H |
+| **H derivation** | Explicit logic chain in text | H stated without justification |
+| **Data** | Source, N, filters documented | "Data from WRDS" — no detail |
+| **Method** | FE justified, SEs cited | OLS only, no discussion of bias |
+| **Results** | Each coefficient interpreted | Table only — "as shown in Table 2" |
+| **Discussion** | Links result back to cited theory | "Results were significant" |
+| **Limitations** | Two specific, honest limitations | None, or vague "more research needed" |
+:::
+
+::: {.box}
+**The examiner's core question:** could someone reproduce your result, and understand what it means, by reading this note alone?
+:::
+
+---
+
+## Quarto — File Extension & YAML Header {background-color="#f0f4f9"}
+
+::: {.box}
+**Use `.qmd` not `.md`** — Quarto requires the `.qmd` extension for documents with executable Python chunks. Name your file `research_note.qmd`.
+:::
+
+```yaml
+---
+title: "Your Title"
+subtitle: "A Panel Data Analysis"
+author: |
+  Your Name | ExInt II | WU Vienna | SS 2026
+  https://github.com/[your-username]/[your-repo]
+date: "June 2026"
+bibliography: references/library.bib
+csl: references/apa.csl
+format:
+  pdf:
+    toc: false
+    number-sections: true
+    geometry: margin=2.5cm
+    fontsize: 11pt
+    linestretch: 1.3
+execute:
+  eval: true      # run Python chunks → tables and numbers update automatically
+  echo: false     # hide code from PDF
+  warning: false
+  message: false
+---
+```
+
+GitHub URL in `author:` block → appears on title page under your name.
+
+---
+
+## Taskfile — Correct Setup {background-color="#f0f4f9"}
+
+`render` has **no deps** — standalone so `task render` doesn't trigger the whole pipeline.  
+`all` runs the full chain and then renders:
+
+```yaml
+  render:
+    desc: "Render research_note.qmd to PDF via Quarto"
+    cmds:
+      - quarto render research_note.qmd
+
+  all:
+    desc: "Full pipeline — analysis + PDF"
+    deps: [regression]
+    cmds:
+      - quarto render research_note.qmd
+```
+
+So: `task render` → PDF only. `task all` → pull → clean → descriptives → regression → PDF.
+
+**Fix the `apa.csl` error — download and commit once:**
+
+```powershell
+Invoke-WebRequest `
+  -Uri "https://raw.githubusercontent.com/citation-style-language/styles/master/apa.csl" `
+  -OutFile "references\apa.csl"
+git add references/apa.csl && git commit -m "add apa.csl" && git push
+```
+
+::: {.box}
+`apa.csl` must be **committed to Git** — the examiner's `task all` also needs it.
+:::
+
+---
+
+## Quarto — Markdown Syntax
+
+```markdown
+# Section heading (auto-numbered: "1 Introduction")
+## Subsection ("1.1 Background")
+
+Normal paragraph. **Bold.** *Italic.*
+
+Inline citation:      [@cohenAbsorptiveCapacityNew1990]
+Multiple citations:   [@cohenAbsorptiveCapacityNew1990; @grilichesIssuesAssessingContribution1979]
+Author as subject:    @petersenEstimatingStandardErrors2009 show that...
+
+Hypothesis block quote:
+> **H1:** [Your hypothesis in one sentence.]
+> *(Test: β(variable) [sign] and significant)*
+
+Inline math:    $\beta_1 < 0$
+Display math:
+$$\text{RoA}_{it} = \beta_1 X_{it} + \mu_i + \lambda_t + \varepsilon_{it}$$
+```
+
+::: {.box}
+Citation key must match `library.bib` exactly — check by opening the file and looking at the `@article{key,` line. Zotero generates keys like `cohenAbsorptiveCapacityNew1990`.
+:::
+
+---
+
+## Figures and Tables — Fully Automated
+
+The whole point of the pipeline: output files flow directly into the PDF.
+
+**Figures — static path, always fresh after `task all`:**
+```markdown
+![Caption.](output/figures/main_relationship.png){width=90%}
+```
+
+**Tables — Python chunk reads the CSV:**
+````markdown
+```{{python}}
+#| label: tbl-regression
+#| tbl-cap: "Regression results. * p<0.10, ** p<0.05, *** p<0.01."
+import pandas as pd
+results = pd.read_csv("output/tables/regression_results.csv", index_col=0)
+results[["(1) OLS", "(2) TWFE", "(3) TWFE+H2"]]
+```
+````
+
+**Inline numbers — no hardcoding anywhere:**
+````markdown
+```{{python}}
+#| label: setup
+import pandas as pd
+panel = pd.read_parquet("data/processed/panel_with_vars.parquet")
+n_obs      = int(panel.shape[0])
+roa_median = round(panel["roa"].median(), 3)
+```
+The sample comprises `{python} f"{n_obs:,}"` firm-years.
+Median RoA is `{python} roa_median`.
+````
+
+::: {.box}
+Re-run `task all` → every number, table, and figure in the PDF updates. This is reproducible research.
+:::
+
+---
+
+## Writing the Introduction — AMJ "Setting the Hook"
+
+AMJ Part 3: two failure modes — the **topic introduction** (describes a field, never states a gap) and the **methods introduction** (jumps to what you did before establishing why it matters).
+
+**Four-element structure:**
+
+```markdown
+[Paragraph 1] — What is known and why it matters.
+Cite 2-3 papers establishing the field.
+
+[Paragraph 2] — What is NOT known (the gap).
+This is where your RQ lives.
+
+[Paragraph 3] — What this note does and what it finds.
+One sentence each: sample, method, main result.
+
+> **Research question:** [One sentence, ending with a question mark.]
+```
+
+::: {.amj-box}
+**AMJ Part 3:** "Effective introductions tell readers something they do not already know. Describing 'a large literature on X' is not a gap — it is a topic. The gap is what that literature has not yet answered."
+:::
+
+---
+
+## Writing the Theory Section — AMJ "Grounding Hypotheses"
+
+AMJ Part 4: a hypothesis without a theoretical mechanism is a guess.
+
+**Structure for each hypothesis:**
+
+```markdown
+[Paragraph 1] — Theory: what does [theory] claim? Cite 2 papers.
+
+[Paragraph 2] — Mechanism: how does this apply in your context?
+Why does [theory] predict [direction] for your specific sample?
+
+[Paragraph 3] — Boundary condition (if any): why SMEs, why Europe?
+
+> **H1:** [Directional claim in one sentence.]
+> *(Test: expected sign of coefficient)*
+```
+
+::: {.amj-box}
+**AMJ Part 4:** "The best hypotheses surprise you a little. If your H is obvious from the first sentence of the paper, you have not built an argument — you have stated a fact."
+:::
+
+---
+
+## Writing Results — Interpret, Don't Just Report
+
+::: {.amj-box}
+**AMJ Part 6:** "Results sections that simply recite statistics add nothing. Readers can read a table. Tell them what the number means."
+:::
+
+**Three required elements per hypothesis:**
+
+```markdown
+**H1.** [Variable] is [sign] and [significant/not significant]
+(β = `{python} b_x`, p < 0.01, Model 2).
+**H1 is [supported / not supported].**
+[One plain-language sentence: what does this coefficient mean?]
+
+**OLS vs FE.** The OLS estimate (`{python} b_ols`) differs from
+the FE estimate (`{python} b_fe`) by `{python} pct`%, confirming
+omitted variable bias [@hausmanSpecificationTestsEconometrics1978].
+```
+
+::: {.box}
+Use inline `{python}` expressions to pull coefficients directly — numbers match the table automatically.
+:::
+
+---
+
+## Writing Discussion & Conclusion — AMJ "The Return"
+
+AMJ Part 7: the discussion is the "return trip" from data back to theory.
+
+**Discussion — one paragraph:**
+
+- Restate main finding in one sentence
+- Link back to the specific theory you cited — what does this tell us about that theory?
+- Note one unexpected or nuanced pattern
+- One real-world implication
+
+**Conclusion — one paragraph:**
+
+- Answer the RQ directly: "This note finds that..."
+- Two specific limitations — not "more research is needed"
+- One concrete future research direction
+
+::: {.amj-box}
+**AMJ Part 7:** "The discussion is your opportunity to show that you understand what your findings mean — not just that they are statistically significant. Significance is the floor, not the ceiling."
+:::
+
+---
+
+## Common Errors
+
+| Error | Fix |
+|-------|-----|
+| `You must use .qmd extension` | Rename `research_note.md` → `research_note.qmd` |
+| `apa.csl not found` | Download + commit — see Taskfile slide |
+| `bibliography not found` | Check path `references/library.bib` |
+| `LaTeX error` | `quarto install tinytex` |
+| Citation shows `[@key]` literally | Key mismatch — open `.bib` and check exact key |
+| `ModuleNotFoundError` in chunk | venv not active — run `task all`, not `quarto render` alone |
+| Numbers in text differ from table | Stale output — rerun `task all` |
+| `task render` triggers full pipeline | Remove `deps` from `render` task — see Taskfile slide |
+
+---
+
+## Submission — June 28, 2026 {background-color="#002f5f"}
+
+**Submit:** `research_note.pdf` via Canvas.
+
+**Repo must contain:**
+
+```
+├── code/01_pull_data.py  02_clean.py  03_descriptives.py  04_regression.py
+├── references/library.bib   references/apa.csl   ← both committed
+├── research_note.qmd        ← .qmd not .md
+├── Taskfile.yml             ← render in cmds of all, standalone render task
+├── requirements.txt         ← includes jupyter and nbformat
+├── pyproject.toml           ← no duplicate [tool.ruff] sections
+├── .env.example             ← NOT .env
+└── README.md
+```
+
+**Voluntary peer check:** swap links with a classmate on the same OS, clone their repo, run `task all`, confirm PDF appears.
+
+::: {.blue-box}
+**Examiner workflow:** clone → `python -m venv .venv` → `pip install -r requirements.txt` → add `.env` → `task all` → open `research_note.pdf`.
+
+**Deadline: June 28, 2026 — 23:59.**
+:::
