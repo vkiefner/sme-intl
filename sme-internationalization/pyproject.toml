@@ -1,7 +1,7 @@
 [project]
 name = "sme-internationalization"
 version = "0.1.0"
-description = "DOI and firm performance among European SMEs — ExInt II WU Vienna SS 2026"
+description = "R&D intensity and firm performance among European SMEs — ExInt II WU Vienna SS 2026"
 requires-python = ">=3.10"
 dependencies = [
   "pandas>=2.2.0",
@@ -12,23 +12,25 @@ dependencies = [
   "seaborn>=0.13.0",
   "wrds>=3.2.0",
   "python-dotenv>=1.0.0",
+  "scipy>=1.12.0",
+  "pyarrow>=15.0.0",
+  "jupyter>=1.0.0",
+  "nbformat>=5.10.0",
 ]
 
 # ── Ruff: linting + formatting (replaces flake8 + Black + isort) ──────────────
 [tool.ruff]
 line-length = 88
 indent-width = 4
-exclude = [".venv", "__pycache__"]
+exclude = [".venv", "__pycache__", "*.md"]
 
 [tool.ruff.lint]
-# E4: import errors, E7: statement errors, E9: runtime errors, F: pyflakes
 select = ["E4", "E7", "E9", "F"]
 ignore = []
+
+[tool.ruff.lint.per-file-ignores]
+"*.ipynb" = ["F821"]
 
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
-
-[tool.ruff]
-line-length = 88
-exclude = [".venv", "*.md"]

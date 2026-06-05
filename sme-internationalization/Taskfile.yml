@@ -1,36 +1,45 @@
 version: '3'
 
+
 # Run the full pipeline:  task all
 # Run individual steps:   task pull / task clean / task descriptives / task regression
+# Render PDF:             task render
 # Lint & format:          task lint / task format
 
 tasks:
   pull:
-    desc: "Download raw firm data from WRDS Compustat Global"
+    desc: "Download raw firm data from WRDS"
     cmds:
       - python code/01_pull_data.py
 
   clean:
-    desc: "Apply SME filter, construct variables, winsorize"
+    desc: "Apply filters, build panel"
     deps: [pull]
     cmds:
       - python code/02_clean.py
 
   descriptives:
-    desc: "Summary statistics and exploratory figures"
+    desc: "Summary statistics and figures"
     deps: [clean]
     cmds:
       - python code/03_descriptives.py
 
   regression:
-    desc: "Panel fixed-effects regressions (H1 + H2)"
+    desc: "Panel fixed-effects regressions"
     deps: [descriptives]
     cmds:
       - python code/04_regression.py
 
+  render:
+    desc: "Render research_note.qmd to PDF via Quarto (Typst)"
+    cmds:
+      - quarto render research_note.qmd --to typst
+
   all:
-    desc: "Run the full pipeline end-to-end"
+    desc: "Full pipeline — analysis + PDF"
     deps: [regression]
+    cmds:
+      - quarto render research_note.qmd --to typst
 
   lint:
     desc: "Check code quality with ruff"
@@ -41,8 +50,3 @@ tasks:
     desc: "Auto-format code with ruff"
     cmds:
       - ruff format code/
-
-  render:
-    desc: "Render research_note.md to PDF via Quarto"
-    cmds:
-      - quarto render research_note.md
