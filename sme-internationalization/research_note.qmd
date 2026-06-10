@@ -1,8 +1,7 @@
 ---
 title: "R&D Intensity and Firm Performance among European SMEs"
 subtitle: "A Panel Data Analysis"
-author: |
-  [Your Name] | ExInt II | WU Vienna | SS 2026
+author: Your Name | ExInt II | WU Vienna | SS 2026 |  
   https://github.com/vkiefner/sme-intl
 date: "June 2026"
 bibliography: references/library.bib
